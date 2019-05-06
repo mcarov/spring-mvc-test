@@ -13,8 +13,13 @@ import java.util.List;
 public class MovieService {
     private final MessageSource source;
     private final MovieRepository repo;
+    private final CsvFileService fileService;
 
-    public List<Movie> getALl() {
+    public List<Movie> getTop20() {
+        return null;
+    }
+
+    public List<Movie> getAll() {
         return null;
     }
 

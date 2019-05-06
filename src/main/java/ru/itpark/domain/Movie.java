@@ -13,8 +13,8 @@ public class Movie {
     private String homePage;
     private long id;
     private String keywords;
-    private String origLanguage;
-    private String origTitle;
+    private String originalLanguage;
+    private String originalTitle;
     private String overview;
     private double popularity;
     private String productionCompanies;

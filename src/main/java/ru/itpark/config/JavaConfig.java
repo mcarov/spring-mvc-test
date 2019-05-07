@@ -8,7 +8,6 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import ru.itpark.service.CsvFileService;
 
 import javax.sql.DataSource;
 
@@ -27,11 +26,6 @@ public class JavaConfig {
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
-    }
-
-    @Bean
-    public CsvFileService csvFileService() {
-        return new CsvFileService();
     }
 
     @Bean

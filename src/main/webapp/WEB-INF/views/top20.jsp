@@ -1,13 +1,28 @@
-<!doctype html>
-<html lang="en">
+<%@ page import="ru.itpark.domain.Movie" %>
+<%@ page import="java.util.List" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Top 20</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <%@include file="bootstrap-css.jsp"%>
+
+    <title>Movies Top 20</title>
 </head>
 <body>
-    <h1>Top 20 Movies</h1>
+    <div class="container">
+        <h1 class="text-center">Movies Top 20</h1>
+        <ol>
+            <% if(request.getAttribute("top20") != null){ %>
+            <% for(Movie movie : (List<Movie>)request.getAttribute("top20")){ %>
+            <li>
+                <%=movie.getOriginalTitle()%> : <%=movie.getPopularity()%>
+            </li>
+            <% } %>
+            <% } %>
+        </ol>
+    </div>
 </body>
 </html>

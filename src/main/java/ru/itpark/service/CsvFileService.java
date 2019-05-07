@@ -11,21 +11,23 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CsvFileService {
 
-    public void importFromCsvFile(String path) throws IOException {
+    List<Movie> importFromCsvFile(String path) throws IOException {
         try(Reader reader = Files.newBufferedReader(Paths.get(path).resolve("tmdb_5000_movies.csv"));
             CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT.
                     withFirstRecordAsHeader().
                     withIgnoreHeaderCase().
                     withTrim())) {
-            int count = 0;
+            List<Movie> movies = new ArrayList<>();
             for(CSVRecord record : parser) {
-                System.out.printf("%4d   %s%n", ++count, getMovie(record));
-                if(count == 500) break;
+                movies.add(getMovie(record));
             }
+            return movies;
         }
     }
 

@@ -1,4 +1,4 @@
-package ru.itpark.inint;
+package ru.itpark.init;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import ru.itpark.config.JavaConfig;

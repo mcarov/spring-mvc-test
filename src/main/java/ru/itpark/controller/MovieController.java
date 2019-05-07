@@ -14,8 +14,8 @@ public class MovieController {
     private final MovieService service;
 
     @GetMapping
-    public String getAll(Model model) {
-        model.addAttribute("top20", service.getAll());
+    public String getTop20(Model model) {
+        model.addAttribute("top20", service.getTop20());
         return "top20";
     }
 }

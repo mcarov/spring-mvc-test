@@ -66,4 +66,20 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>repository.spring.milestone</id>
+            <url>http://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+
 </project>

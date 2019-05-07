@@ -7,6 +7,7 @@ import ru.itpark.domain.Movie;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class MovieRepository {
@@ -45,7 +46,30 @@ public class MovieRepository {
     }
 
     public void save(Movie movie) {
-
+        template.update("INSERT INTO movies (" +
+                "budget, " +
+                "genres, " +
+                "homepage, " +
+                "id, " +
+                "keywors, " +
+                "origina_language, " +
+                "original_title, " +
+                "overview, " +
+                "popularity, " +
+                "production_companies, " +
+                "production_countries, " +
+                "release_date, " +
+                "runtime, " +
+                "spoken_languages, " +
+                "status, " +
+                "tagline, " +
+                "title, " +
+                "vote_average, " +
+                "vote_count " +
+                "VALUES (:budget, :genres, :homepage, :id, :keywords, :origina_language, :original_title," +
+                ":overview, :popularity, :production_companies, :production_countries, :release_date, " +
+                ":runtime, :spoken_languages, :status, :tagline, :title, :vote_average, :vote_count))",
+                Map.of("budget", movie.getBudget(), "genres", movie.getGenres()));
     }
 
     public void removeById(long id) {

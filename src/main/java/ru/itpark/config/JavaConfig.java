@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import ru.itpark.service.CsvFileService;
 
 import javax.sql.DataSource;
@@ -31,5 +32,13 @@ public class JavaConfig {
     @Bean
     public CsvFileService csvFileService() {
         return new CsvFileService();
+    }
+
+    @Bean
+    public InternalResourceViewResolver viewResolver() {
+        var viewResolver = new InternalResourceViewResolver();
+        viewResolver.setPrefix("/WEB-INF/views/");
+        viewResolver.setSuffix(".jsp");
+        return viewResolver;
     }
 }

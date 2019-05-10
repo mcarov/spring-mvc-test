@@ -9,20 +9,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Movie {
     private long budget;
-    private String genres;
+    private Genre[] genres;
     private String homePage;
     private long id;
-    private String keywords;
+    private Keyword[] keywords;
     private String originalLanguage;
     private String originalTitle;
     private String overview;
     private double popularity;
-    private String productionCompanies;
-    private String productionCountries;
+    private ProductionCompany[] productionCompanies;
+    private ProductionCountry[] productionCountries;
     private String releaseDate;
     private long revenue;
     private int runtime;
-    private String spokenLanguages;
+    private SpokenLanguage[] spokenLanguages;
     private String status;
     private String tagline;
     private String title;

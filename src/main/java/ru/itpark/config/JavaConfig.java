@@ -1,5 +1,6 @@
 package ru.itpark.config;
 
+import com.google.gson.Gson;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,6 +16,7 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan("ru.itpark")
 public class JavaConfig {
+
     @Bean
     public DataSource dataSource() {
         return new JndiDataSourceLookup().getDataSource("java:comp/env/jdbc/db");
@@ -34,5 +36,10 @@ public class JavaConfig {
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
         return viewResolver;
+    }
+
+    @Bean
+    public Gson gson() {
+        return new Gson();
     }
 }

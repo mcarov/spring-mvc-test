@@ -1,21 +1,21 @@
 package ru.itpark.init;
 
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 import ru.itpark.config.JavaConfig;
 
-public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
-    @Override
-    protected Class<?>[] getRootConfigClasses() {
-        return new Class[] {JavaConfig.class};
-    }
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 
+public class AppInitializer implements WebApplicationInitializer {
     @Override
-    protected Class<?>[] getServletConfigClasses() {
-        return new Class[0];
-    }
+    public void onStartup(ServletContext servletContext)  {
+        AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
+        wac.register(JavaConfig.class);
 
-    @Override
-    protected String[] getServletMappings() {
-        return new String[] {"/"};
+        ServletRegistration.Dynamic registration = servletContext.addServlet("dispatcher", new DispatcherServlet(wac));
+        registration.setLoadOnStartup(1);
+        registration.addMapping("/");
     }
 }

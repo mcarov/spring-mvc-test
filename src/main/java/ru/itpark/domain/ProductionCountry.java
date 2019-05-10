@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductinCountry {
+public class ProductionCountry {
     private String iso_3166_1;
     private String name;
 }

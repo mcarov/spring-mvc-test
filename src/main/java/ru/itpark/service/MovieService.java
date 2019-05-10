@@ -22,6 +22,10 @@ public class MovieService {
         return repository.getTop20();
     }
 
+    public Movie getById(long id) {
+        return repository.getById(id);
+    }
+
     public List<Movie> getAll() {
         return null;
     }

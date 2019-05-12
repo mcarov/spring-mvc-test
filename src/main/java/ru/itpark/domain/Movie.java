@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +21,7 @@ public class Movie {
     private double popularity;
     private ProductionCompany[] productionCompanies;
     private ProductionCountry[] productionCountries;
-    private String releaseDate;
+    private Date releaseDate;
     private long revenue;
     private int runtime;
     private SpokenLanguage[] spokenLanguages;

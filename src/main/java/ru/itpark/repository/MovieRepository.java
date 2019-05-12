@@ -8,6 +8,8 @@ import ru.itpark.domain.*;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +17,10 @@ import static java.util.Map.entry;
 
 @Repository
 public class MovieRepository {
+    private final NamedParameterJdbcTemplate template;
     private Gson gson;
 
-    private final NamedParameterJdbcTemplate template;
-    private final RowMapper<Movie> fullRowMapper = (resultSet, i) -> {
+    private final RowMapper<Movie> movieFullRowMapper = (resultSet, i) -> {
         Movie movie = new Movie();
         movie.setBudget(resultSet.getLong(1));
         movie.setGenres(
@@ -35,7 +37,7 @@ public class MovieRepository {
                 gson.fromJson(resultSet.getString(10), ProductionCompany[].class));
         movie.setProductionCountries(
                 gson.fromJson(resultSet.getString(11), ProductionCountry[].class));
-        movie.setReleaseDate(resultSet.getString(12));
+        movie.setReleaseDate(Date.from(Instant.ofEpochSecond(resultSet.getLong(12))));
         movie.setRevenue(resultSet.getLong(13));
         movie.setRuntime(resultSet.getInt(14));
         movie.setSpokenLanguages(
@@ -48,16 +50,29 @@ public class MovieRepository {
         return movie;
     };
 
-    private final RowMapper<Movie> simpleRowMapper = (resultSet, i) -> {
+    private final RowMapper<Movie> movieSimpleRowMapper = (resultSet, i) -> {
         Movie movie = new Movie();
         movie.setId(resultSet.getLong(1));
         movie.setTitle(resultSet.getString(2));
         movie.setPopularity(resultSet.getDouble(3));
+        movie.setReleaseDate(Date.from(Instant.ofEpochSecond(resultSet.getLong(4))));
+        movie.setGenres(
+                gson.fromJson(resultSet.getString(5), Genre[].class));
+        movie.setProductionCompanies(
+                gson.fromJson(resultSet.getString(6), ProductionCompany[].class));
+        movie.setProductionCountries(
+                gson.fromJson(resultSet.getString(7), ProductionCountry[].class));
         return movie;
     };
 
+    private final RowMapper<Genre[]> genreRowMapper = (resultSet, i) ->
+            gson.fromJson(resultSet.getString(1), Genre[].class);
+
+    private final RowMapper<ProductionCompany[]> companyRowMapper = (resultSet, i) ->
+            gson.fromJson(resultSet.getString(1), ProductionCompany[].class);
+
     public MovieRepository(DataSource source, Gson gson) {
-        template = new NamedParameterJdbcTemplate(source);
+        this.template = new NamedParameterJdbcTemplate(source);
         this.gson = gson;
     }
 
@@ -75,7 +90,7 @@ public class MovieRepository {
                 "popularity REAL, " +
                 "production_companies TEXT, " +
                 "production_countries TEXT, " +
-                "release_date TEXT, " +
+                "release_date INTEGER, " +
                 "revenue INTEGER , " +
                 "runtime INTEGER, " +
                 "spoken_languages TEXT, " +
@@ -84,6 +99,10 @@ public class MovieRepository {
                 "title TEXT, " +
                 "vote_average REAL, " +
                 "vote_count INTEGER)");
+    }
+
+    public int size() {
+        return template.queryForObject("SELECT COUNT(*) FROM movies", Map.of(), Integer.class);
     }
 
     public Movie getById(long id) {
@@ -107,21 +126,64 @@ public class MovieRepository {
                "tagline, " +
                "title, " +
                "vote_average, " +
-               "vote_count " +
-               "FROM movies WHERE id = :id", Map.of("id", id), fullRowMapper);
+               "vote_count FROM movies WHERE id = :id", Map.of("id", id), movieFullRowMapper);
        return list.get(0);
-    }
-
-    public List<Movie> getListOf20(int offset) {
-        return template.query(
-                "SELECT id, title, popularity FROM movies ORDER BY popularity DESC LIMIT :offset, 20",
-                Map.of("offset", offset), simpleRowMapper);
     }
 
     public List<Movie> getTop20() {
         return template.query(
-                "SELECT id, title, popularity FROM movies ORDER BY popularity DESC LIMIT 20",
-                simpleRowMapper);
+                "SELECT id, " +
+                        "title, " +
+                        "popularity, " +
+                        "release_date, " +
+                        "genres, " +
+                        "production_companies, " +
+                        "production_countries FROM movies ORDER BY popularity DESC LIMIT 20",
+                movieSimpleRowMapper);
+    }
+
+    public List<Movie> getListOf50(int offset) {
+        return template.query(
+                "SELECT id, " +
+                        "title, " +
+                        "popularity, " +
+                        "release_date, " +
+                        "genres, " +
+                        "production_companies, " +
+                        "production_countries FROM movies ORDER BY popularity DESC LIMIT :offset, 50",
+                Map.of("offset", offset), movieSimpleRowMapper);
+    }
+
+    public List<Movie> getTop20OfGenre(long id) {
+        return template.query(
+                "SELECT id, " +
+                        "title, " +
+                        "popularity," +
+                        "release_date," +
+                        "genres," +
+                        "production_companies," +
+                        "production_countries FROM movies WHERE genres LIKE :pattern ORDER BY popularity DESC LIMIT 20",
+                Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), ",%")), movieSimpleRowMapper);
+    }
+
+    public List<Movie> getNewestOfCompany(long id) {
+        return template.query(
+                "SELECT id, " +
+                        "title, " +
+                        "popularity," +
+                        "release_date," +
+                        "genres," +
+                        "production_companies," +
+                        "production_countries FROM movies WHERE production_companies LIKE :pattern ORDER BY release_date DESC",
+                Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), "}%")), movieSimpleRowMapper);
+    }
+
+    public List<Genre[]> getGenres() {
+        return template.query("SELECT genres FROM movies", genreRowMapper);
+    }
+
+    public List<ProductionCompany[]> getCompanies() {
+        return template.query("SELECT production_companies FROM movies", companyRowMapper);
     }
 
     public void save(Movie movie) {
@@ -149,7 +211,6 @@ public class MovieRepository {
                 "VALUES (:budget, :genres, :homepage, :id, :keywords, :original_language, :original_title, " +
                 ":overview, :popularity, :production_companies, :production_countries, :release_date, :revenue, " +
                 ":runtime, :spoken_languages, :status, :tagline, :title, :vote_average, :vote_count)", getParamMap(movie));
-
     }
 
     public void removeById(long id) {
@@ -157,7 +218,8 @@ public class MovieRepository {
     }
 
     private Map<String, ?> getParamMap(Movie movie) {
-        return Map.ofEntries(entry("budget", movie.getBudget()),
+        return Map.ofEntries(
+                entry("budget", movie.getBudget()),
                 entry("genres", gson.toJson(movie.getGenres())),
                 entry("homepage", movie.getHomePage()),
                 entry("id", movie.getId()),
@@ -168,7 +230,7 @@ public class MovieRepository {
                 entry("popularity", movie.getPopularity()),
                 entry("production_companies", gson.toJson(movie.getProductionCompanies())),
                 entry("production_countries", gson.toJson(movie.getProductionCountries())),
-                entry("release_date", movie.getReleaseDate()),
+                entry("release_date",movie.getReleaseDate().getTime()/1000),
                 entry("revenue", movie.getRevenue()),
                 entry("runtime", movie.getRuntime()),
                 entry("spoken_languages", gson.toJson(movie.getSpokenLanguages())),

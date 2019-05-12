@@ -6,7 +6,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import ru.itpark.config.JavaConfig;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
+import static  javax.servlet.ServletRegistration.Dynamic;
 
 public class AppInitializer implements WebApplicationInitializer {
     @Override
@@ -14,7 +14,7 @@ public class AppInitializer implements WebApplicationInitializer {
         AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
         wac.register(JavaConfig.class);
 
-        ServletRegistration.Dynamic registration = servletContext.addServlet("dispatcher", new DispatcherServlet(wac));
+        Dynamic registration = servletContext.addServlet("dispatcher", new DispatcherServlet(wac));
         registration.setLoadOnStartup(1);
         registration.addMapping("/");
     }

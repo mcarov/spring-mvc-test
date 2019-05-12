@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -54,7 +58,17 @@ public class CsvFileService {
                 gson.fromJson(record.get("production_companies"), ProductionCompany[].class));
         movie.setProductionCountries(
                 gson.fromJson(record.get("production_countries"), ProductionCountry[].class));
-        movie.setReleaseDate(record.get("release_date"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            String releaseDate = record.get("release_date");
+            if(StringUtils.isNotBlank(releaseDate))
+                movie.setReleaseDate(dateFormat.parse(record.get("release_date")));
+            else
+                movie.setReleaseDate(new Date(0));
+        }
+        catch(ParseException e) {
+            e.printStackTrace();
+        }
         movie.setRevenue(Long.parseLong(record.get("revenue")));
         String runtime = record.get("runtime");
         if(StringUtils.isNumeric(runtime))

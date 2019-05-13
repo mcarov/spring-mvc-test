@@ -86,7 +86,7 @@ public class MovieService {
 
     public void updateFromFile() throws IOException {
         if(movies.size() != 0) return;
-        movies = fileService.importFromCsvFile("C:/Users/KO-01/Desktop/Spring");
+        movies = fileService.importFromCsvFile("C:/Users/Dmitry/Desktop/Spring");
         for(Movie movie : movies) {
             repository.save(movie);
         }

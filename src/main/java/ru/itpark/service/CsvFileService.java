@@ -1,6 +1,7 @@
 package ru.itpark.service;
 
 import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -22,12 +23,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CsvFileService implements Constants {
-    private Gson gson;
-
-    public CsvFileService(Gson gson) {
-        this.gson = gson;
-    }
+    private final Gson gson;
 
     List<Movie> importFromCsvFile(MultipartFile file) throws IOException {
         String csvFileId = UUID.randomUUID().toString();

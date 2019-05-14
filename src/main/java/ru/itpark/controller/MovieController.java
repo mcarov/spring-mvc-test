@@ -30,8 +30,9 @@ public class MovieController implements Constants {
 
     @GetMapping("/")
     public String getTop20(Model model) {
-        //model.addAllAttributes(Map.of("movies", movieService.getTop20(), "translation", translatorService.translate(navbarItems)));
-        model.addAttribute("movies", movieService.getTop20());
+        model.addAllAttributes(Map.of(
+                "movies", movieService.getTop20(),
+                "translation", translatorService.translate(navbarItems)));
         return "main";
     }
 
@@ -39,19 +40,27 @@ public class MovieController implements Constants {
     public String getListOf50(Model model, @PathVariable int num) {
         int lastNum = (int)Math.ceil(movieService.getRepositorySize()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
-        model.addAllAttributes(Map.of("movies", movieService.getList(num), "page", num, "last", lastNum));
+        model.addAllAttributes(Map.of(
+                "movies", movieService.getList(num),
+                "translation", translatorService.translate(navbarItems),
+                "page", num,
+                "last", lastNum));
         return "movies";
     }
 
     @GetMapping("/movies/{id}")
     public String getMovie(Model model, @PathVariable long id) {
-        model.addAttribute("movie", movieService.getById(id));
+        model.addAllAttributes(Map.of(
+                "movie", movieService.getById(id),
+                "translation", translatorService.translate(navbarItems)));
         return "movie";
     }
 
     @GetMapping("/genres")
     public String getGenres(Model model) {
-        model.addAttribute("genres", movieService.getGenres());
+        model.addAllAttributes(Map.of(
+                "genres", movieService.getGenres(),
+                "translation", translatorService.translate(navbarItems)));
         return "genres";
     }
 
@@ -59,7 +68,10 @@ public class MovieController implements Constants {
     public String getTop20OfGenre(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getTop20OfGenre(id);
         Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
-        model.addAllAttributes(Map.of("movies", list, "genre", genre.getName()));
+        model.addAllAttributes(Map.of(
+                "movies", list,
+                "genre", genre.getName(),
+                "translation", translatorService.translate(navbarItems)));
         return "genre";
     }
 
@@ -70,6 +82,7 @@ public class MovieController implements Constants {
         if(num > lastNum) num = lastNum;
         model.addAllAttributes(Map.of(
                 "companies", companies.subList(LIST_SIZE*(num-1), LIST_SIZE*num < companies.size() ? LIST_SIZE*num : companies.size()),
+                "translation", translatorService.translate(navbarItems),
                 "page", num, "last", lastNum));
         return "companies";
     }
@@ -78,7 +91,10 @@ public class MovieController implements Constants {
     public String getNewestOfCompany(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getMoviesOfCompany(id);
         ProductionCompany company = Arrays.stream(list.get(0).getProductionCompanies()).filter(c -> c.getId() == id).findFirst().get();
-        model.addAllAttributes(Map.of("movies", list, "company", company.getName()));
+        model.addAllAttributes(Map.of(
+                "movies", list,
+                "company", company.getName(),
+                "translation", translatorService.translate(navbarItems)));
         return "company";
     }
 
@@ -89,6 +105,7 @@ public class MovieController implements Constants {
         if(num > lastNum) num = lastNum;
         model.addAllAttributes(Map.of(
                 "collections", collections.subList(LIST_SIZE*(num-1), LIST_SIZE*num < collections.size() ? LIST_SIZE*num : collections.size()),
+                "translation", translatorService.translate(navbarItems),
                 "page", num, "last", lastNum));
         return "collections";
     }
@@ -97,7 +114,10 @@ public class MovieController implements Constants {
     public String getCollection(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getMoviesOfCollection(id);
         Keyword collection = Arrays.stream(list.get(0).getKeywords()).filter(k -> k.getId() == id).findFirst().get();
-        model.addAllAttributes(Map.of("movies", list, "collection", collection.getName()));
+        model.addAllAttributes(Map.of(
+                "movies", list,
+                "collection", collection.getName(),
+                "translation", translatorService.translate(navbarItems)));
         return "collection";
     }
 

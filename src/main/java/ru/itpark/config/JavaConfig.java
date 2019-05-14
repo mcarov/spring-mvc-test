@@ -16,7 +16,6 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan("ru.itpark")
 public class JavaConfig {
-
     @Bean
     public DataSource dataSource() {
         return new JndiDataSourceLookup().getDataSource("java:comp/env/jdbc/db");
@@ -25,8 +24,8 @@ public class JavaConfig {
     @Bean
     public MessageSource messageSource() {
         var messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("/resources/translate");
-        messageSource.setDefaultEncoding("UTF-16");
+        messageSource.setBasename("classpath:translate");
+        messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
 

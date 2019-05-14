@@ -1,8 +1,9 @@
 package ru.itpark.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import ru.itpark.Constants;
 import ru.itpark.domain.Genre;
 import ru.itpark.domain.Keyword;
 import ru.itpark.domain.Movie;
@@ -15,11 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MovieService {
-    private final MessageSource source;
+public class MovieService implements Constants {
     private final MovieRepository repository;
     private final CsvFileService fileService;
-    private List<Movie> movies = new ArrayList<>(5000);
 
     public int getRepositorySize() {
         return repository.size();
@@ -33,9 +32,9 @@ public class MovieService {
         return repository.getTop20();
     }
 
-    public List<Movie> getListOf50(int number) {
-        int offset = 50*(number-1);
-        return repository.getListOf50(offset);
+    public List<Movie> getList(int number) {
+        int offset = LIST_SIZE*(number-1);
+        return repository.getList(offset);
     }
 
     public List<Movie> getTop20OfGenre(long id) {
@@ -43,11 +42,11 @@ public class MovieService {
     }
 
     public List<Movie> getMoviesOfCompany(long id) {
-        return repository.getMoviesOfCompany(id);
+        return repository.getListByCompany(id);
     }
 
     public List<Movie> getMoviesOfCollection(long id) {
-        return repository.getMoviesOfCollection(id);
+        return repository.getListByCollection(id);
     }
 
     public List<Genre> getGenres() {
@@ -84,9 +83,8 @@ public class MovieService {
 
     }
 
-    public void updateFromFile() throws IOException {
-        if(movies.size() != 0) return;
-        movies = fileService.importFromCsvFile("C:/Users/Dmitry/Desktop/Spring");
+    public void updateFromFile(MultipartFile file) throws IOException {
+        List<Movie> movies = fileService.importFromCsvFile(file);
         for(Movie movie : movies) {
             repository.save(movie);
         }

@@ -6,6 +6,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import ru.itpark.Constants;
 import ru.itpark.domain.*;
 
 import java.io.IOException;
@@ -17,17 +19,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
-public class CsvFileService {
+public class CsvFileService implements Constants {
     private Gson gson;
 
     public CsvFileService(Gson gson) {
         this.gson = gson;
     }
 
-    List<Movie> importFromCsvFile(String path) throws IOException {
-        try(Reader reader = Files.newBufferedReader(Paths.get(path).resolve("tmdb_5000_movies.csv"));
+    List<Movie> importFromCsvFile(MultipartFile file) throws IOException {
+        String csvFileId = UUID.randomUUID().toString();
+        file.transferTo(Paths.get(UPLOAD_PATH).resolve(csvFileId));
+
+        try(Reader reader = Files.newBufferedReader(Paths.get(UPLOAD_PATH).resolve(csvFileId));
             CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT.
                     withFirstRecordAsHeader().
                     withIgnoreHeaderCase().

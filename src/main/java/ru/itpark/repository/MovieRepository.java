@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.itpark.Constants;
 import ru.itpark.domain.*;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +17,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 @Repository
-public class MovieRepository {
+public class MovieRepository implements Constants {
     private final NamedParameterJdbcTemplate template;
     private Gson gson;
 
@@ -105,7 +106,7 @@ public class MovieRepository {
     }
 
     public int size() {
-        return template.queryForObject("SELECT COUNT(*) FROM movies", Map.of(), Integer.class);
+        return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM movies", Integer.class);
     }
 
     public Movie getById(long id) {
@@ -144,7 +145,7 @@ public class MovieRepository {
                 movieSimpleRowMapper);
     }
 
-    public List<Movie> getListOf50(int offset) {
+    public List<Movie> getList(int offset) {
         return template.query(
                 "SELECT id, " +
                         "title, " +
@@ -152,8 +153,8 @@ public class MovieRepository {
                         "release_date, " +
                         "genres, " +
                         "production_companies, " +
-                        "keywords FROM movies ORDER BY popularity DESC LIMIT :offset, 50",
-                Map.of("offset", offset), movieSimpleRowMapper);
+                        "keywords FROM movies ORDER BY popularity DESC LIMIT :offset, :limit",
+                Map.of("offset", offset, "limit", LIST_SIZE), movieSimpleRowMapper);
     }
 
     public List<Movie> getTop20OfGenre(long id) {
@@ -168,7 +169,7 @@ public class MovieRepository {
                 Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), ",%")), movieSimpleRowMapper);
     }
 
-    public List<Movie> getMoviesOfCompany(long id) {
+    public List<Movie> getListByCompany(long id) {
         return template.query(
                 "SELECT id, " +
                         "title, " +
@@ -180,7 +181,7 @@ public class MovieRepository {
                 Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), "}%")), movieSimpleRowMapper);
     }
 
-    public List<Movie> getMoviesOfCollection(long id) {
+    public List<Movie> getListByCollection(long id) {
         return template.query(
                 "SELECT id, " +
                         "title, " +

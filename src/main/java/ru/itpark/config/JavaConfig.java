@@ -25,8 +25,8 @@ public class JavaConfig {
     @Bean
     public MessageSource messageSource() {
         var messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
-        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setBasename("/resources/translate");
+        messageSource.setDefaultEncoding("UTF-16");
         return messageSource;
     }
 

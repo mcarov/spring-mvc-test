@@ -56,9 +56,87 @@
             </nav>
             <br>
             <form action="<%=request.getContextPath()%>/create">
-                <div class="form-group">
-                    <label for="title">Название</label>
-                    <input id="title" name="title" class="form-control" type="text" required>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="title">Название</label>
+                            <input id="title" name="title" class="form-control" type="text" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tagline">Слоган</label>
+                            <input id="tagline" name="tagline" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="original-title">Оригинальное название</label>
+                            <input id="original-title" name="original-title" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="original-language">Оригинальный язык</label>
+                            <input id="original-language" name="original-language" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="release-date">Дата выхода</label>
+                            <input id="release-date" name="release-date" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Статус</label>
+                            <input id="status" name="status" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="runtime">Продолжительность</label>
+                            <input id="runtime" name="runtime" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="genres">Жанры</label>
+                            <input id="genres" name="genres" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="companies">Компании-производители</label>
+                            <input id="companies" name="companies" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="countries">Страны производства</label>
+                            <input id="countries" name="countries" class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="spoken-languages">Разговорные языки</label>
+                            <input id="spoken-languages" name="spoken-languages" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Бюджет</label>
+                            <input id="budget" name="budget" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="revenue">Сборы</label>
+                            <input id="revenue" name="revenue" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="homepage">Домашняя страница</label>
+                            <input id="homepage" name="homepage" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="popularity">Популярность</label>
+                            <input id="popularity" name="popularity" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="votes">Количество голосов</label>
+                            <input id="votes" name="votes" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="rating">Рейтинг</label>
+                            <input id="rating" name="rating" class="form-control" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="overview">Обзор</label>
+                            <textarea id="overview" name="overview" class="form-control no-resize"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="keywords">Теги</label>
+                            <textarea  id="keywords" name="keywords" class="form-control no-resize"></textarea>
+                        </div>
+                    </div>
                 </div>
             </form>
         <% } %>

@@ -14,14 +14,15 @@ import java.util.stream.Stream;
 public class TranslatorService {
     private final MessageSource messageSource;
 
-    public List<String> translate(List<String> list, String item) {
-        return Stream.concat(list.stream(), Stream.of(item)).
+    public List<String> translate(List<String> items, String item) {
+        return Stream.concat(items.stream(), Stream.of(item)).
                 map(s -> messageSource.getMessage(s, null, Locale.getDefault())).
                 collect(Collectors.toList());
     }
 
-    public List<String> translate(List<String> list1, List<String> list2) {
-        return Stream.concat(list1.stream(), list2.stream()).
+    @SafeVarargs
+    public final List<String> translate(List<String>... items) {
+        return Stream.of(items).flatMap(List::stream).
                 map(s -> messageSource.getMessage(s, null, Locale.getDefault())).
                 collect(Collectors.toList());
     }

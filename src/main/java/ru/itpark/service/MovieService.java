@@ -3,7 +3,6 @@ package ru.itpark.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.itpark.Constants;
 import ru.itpark.domain.Genre;
 import ru.itpark.domain.Keyword;
 import ru.itpark.domain.Movie;
@@ -52,21 +51,19 @@ public class MovieService {
     }
 
     public List<Genre> getGenres() {
-        List<Genre> list = new ArrayList<>();
-        repository.getGenres().forEach(genres -> list.addAll(Arrays.asList(genres)));
-
         TreeMap<Long, Genre> map = new TreeMap<>();
-        map.putAll(list.stream().collect(Collectors.toMap(Genre::getId, genre -> genre, (key1, key2) -> key2)));
+        map.putAll(repository.getGenres().stream().
+                flatMap(Arrays::stream).
+                collect(Collectors.toMap(Genre::getId, genre -> genre, (key1, key2) -> key2)));
 
         return new ArrayList<>(map.values());
     }
 
     public List<ProductionCompany> getCompanies() {
-        List<ProductionCompany> list = new ArrayList<>();
-        repository.getCompanies().forEach(companies -> list.addAll(Arrays.asList(companies)));
-
         TreeMap<Long, ProductionCompany> map = new TreeMap<>();
-        map.putAll(list.stream().collect(Collectors.toMap(ProductionCompany::getId, company -> company, (key1, key2) -> key2)));
+        map.putAll(repository.getCompanies().stream().
+                flatMap(Arrays::stream).
+                collect(Collectors.toMap(ProductionCompany::getId, company -> company, (key1, key2) -> key2)));
 
         return new ArrayList<>(map.values());
     }

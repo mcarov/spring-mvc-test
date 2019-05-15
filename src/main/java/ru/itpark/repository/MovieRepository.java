@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.itpark.Constants;
 import ru.itpark.domain.*;
 
 import javax.annotation.PostConstruct;
@@ -15,9 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;
+import static ru.itpark.Constants.LIST_SIZE;
 
 @Repository
-public class MovieRepository implements Constants {
+public class MovieRepository {
     private final NamedParameterJdbcTemplate template;
     private Gson gson;
 

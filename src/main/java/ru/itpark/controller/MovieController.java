@@ -3,12 +3,8 @@ package ru.itpark.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.itpark.Constants;
 import ru.itpark.domain.Genre;
 import ru.itpark.domain.Keyword;
 import ru.itpark.domain.Movie;
@@ -17,22 +13,28 @@ import ru.itpark.service.MovieService;
 import ru.itpark.service.TranslatorService;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static ru.itpark.Constants.LIST_SIZE;
 
 @Controller
 @RequiredArgsConstructor
-public class MovieController implements Constants {
+public class MovieController {
     private final MovieService movieService;
     private final TranslatorService translatorService;
-    private List<String> navbarItems = Arrays.asList("navbar.top-20", "navbar.movies", "navbar.collections", "navbar.genres", "navbar.companies");
+
+    private final ArrayList<String> navbarItems = new ArrayList<>(Arrays.asList(
+            "navbar.top-20", "navbar.movies", "navbar.collections", "navbar.genres",
+            "navbar.companies", "navbar.add-movie", "navbar.choose-file", "navbar.import"));
+
+    private final ArrayList<String> tableItems = new ArrayList<>(Arrays.asList(
+            "table.movie", "table.popularity"));
 
     @GetMapping("/")
     public String getTop20(Model model) {
         model.addAllAttributes(Map.of(
-                "movies", movieService.getTop20(),
-                "translation", translatorService.translate(navbarItems)));
+                "translation", translatorService.translate(navbarItems, tableItems),
+                "movies", movieService.getTop20()));
         return "main";
     }
 
@@ -41,8 +43,8 @@ public class MovieController implements Constants {
         int lastNum = (int)Math.ceil(movieService.getRepositorySize()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
         model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, tableItems),
                 "movies", movieService.getList(num),
-                "translation", translatorService.translate(navbarItems),
                 "page", num,
                 "last", lastNum));
         return "movies";
@@ -50,52 +52,15 @@ public class MovieController implements Constants {
 
     @GetMapping("/movies/{id}")
     public String getMovie(Model model, @PathVariable long id) {
+        ArrayList<String> movieItems = new ArrayList<>(Arrays.asList(
+                "movie.original-title", "movie.original-language", "movie.release-date", "movie.status", "movie.runtime",
+                "movie.genres", "movie.companies", "movie.countries", "movie.spoken-languages", "movie.budget",
+                "movie.revenue", "movie.homepage", "movie.popularity", "movie.votes", "movie.keywords"));
+
         model.addAllAttributes(Map.of(
-                "movie", movieService.getById(id),
-                "translation", translatorService.translate(navbarItems)));
+                "translation", translatorService.translate(navbarItems, movieItems),
+                "movie", movieService.getById(id)));
         return "movie";
-    }
-
-    @GetMapping("/genres")
-    public String getGenres(Model model) {
-        model.addAllAttributes(Map.of(
-                "genres", movieService.getGenres(),
-                "translation", translatorService.translate(navbarItems)));
-        return "genres";
-    }
-
-    @GetMapping("/genres/{id}")
-    public String getTop20OfGenre(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getTop20OfGenre(id);
-        Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
-        model.addAllAttributes(Map.of(
-                "movies", list,
-                "genre", genre.getName(),
-                "translation", translatorService.translate(navbarItems)));
-        return "genre";
-    }
-
-    @GetMapping("/companies/page/{num}")
-    public String getCompanies(Model model, @PathVariable int num) {
-        List<ProductionCompany> companies = movieService.getCompanies();
-        int lastNum = (int)Math.ceil(companies.size()*1.0/LIST_SIZE);
-        if(num > lastNum) num = lastNum;
-        model.addAllAttributes(Map.of(
-                "companies", companies.subList(LIST_SIZE*(num-1), LIST_SIZE*num < companies.size() ? LIST_SIZE*num : companies.size()),
-                "translation", translatorService.translate(navbarItems),
-                "page", num, "last", lastNum));
-        return "companies";
-    }
-
-    @GetMapping("/companies/{id}")
-    public String getNewestOfCompany(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getMoviesOfCompany(id);
-        ProductionCompany company = Arrays.stream(list.get(0).getProductionCompanies()).filter(c -> c.getId() == id).findFirst().get();
-        model.addAllAttributes(Map.of(
-                "movies", list,
-                "company", company.getName(),
-                "translation", translatorService.translate(navbarItems)));
-        return "company";
     }
 
     @GetMapping("/collections/page/{num}")
@@ -103,10 +68,20 @@ public class MovieController implements Constants {
         List<Keyword> collections = movieService.getCollections();
         int lastNum = (int)Math.ceil(collections.size()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
-        model.addAllAttributes(Map.of(
-                "collections", collections.subList(LIST_SIZE*(num-1), LIST_SIZE*num < collections.size() ? LIST_SIZE*num : collections.size()),
-                "translation", translatorService.translate(navbarItems),
-                "page", num, "last", lastNum));
+        if(collections.size() > 0) {
+            int firstIndex = LIST_SIZE * (num - 1);
+            int lastIndex = LIST_SIZE * num < collections.size() ? LIST_SIZE * num : collections.size();
+            model.addAllAttributes(Map.of(
+                    "translation", translatorService.translate(navbarItems, "table.collection"),
+                    "collections", collections.subList(firstIndex, lastIndex),
+                    "page", num, "last", lastNum));
+        }
+        else {
+            model.addAllAttributes(Map.of(
+                    "translation", translatorService.translate(navbarItems, "table.collection"),
+                    "collections", collections,
+                    "page", num, "last", lastNum));
+        }
         return "collections";
     }
 
@@ -115,10 +90,62 @@ public class MovieController implements Constants {
         List<Movie> list = movieService.getMoviesOfCollection(id);
         Keyword collection = Arrays.stream(list.get(0).getKeywords()).filter(k -> k.getId() == id).findFirst().get();
         model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, tableItems),
                 "movies", list,
-                "collection", collection.getName(),
-                "translation", translatorService.translate(navbarItems)));
+                "collection", collection.getName()));
         return "collection";
+    }
+
+    @GetMapping("/genres")
+    public String getGenres(Model model) {
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, "table.genre"),
+                "genres", movieService.getGenres()));
+        return "genres";
+    }
+
+    @GetMapping("/genres/{id}")
+    public String getTop20OfGenre(Model model, @PathVariable long id) {
+        List<Movie> list = movieService.getTop20OfGenre(id);
+        Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, tableItems),
+                "movies", list,
+                "genre", genre.getName()));
+        return "genre";
+    }
+
+    @GetMapping("/companies/page/{num}")
+    public String getCompanies(Model model, @PathVariable int num) {
+        List<ProductionCompany> companies = movieService.getCompanies();
+        int lastNum = (int)Math.ceil(companies.size()*1.0/LIST_SIZE);
+        if(num > lastNum) num = lastNum;
+        if(companies.size() > 0) {
+            int firstIndex = LIST_SIZE*(num-1);
+            int lastIndex = LIST_SIZE*num < companies.size() ? LIST_SIZE*num : companies.size();
+            model.addAllAttributes(Map.of(
+                    "translation", translatorService.translate(navbarItems, "table.company"),
+                    "companies", companies.subList(firstIndex, lastIndex),
+                    "page", num, "last", lastNum));
+        }
+        else {
+            model.addAllAttributes(Map.of(
+                    "translation", translatorService.translate(navbarItems, "table.company"),
+                    "companies", companies,
+                    "page", num, "last", lastNum));
+        }
+        return "companies";
+    }
+
+    @GetMapping("/companies/{id}")
+    public String getNewestOfCompany(Model model, @PathVariable long id) {
+        List<Movie> list = movieService.getMoviesOfCompany(id);
+        ProductionCompany company = Arrays.stream(list.get(0).getProductionCompanies()).filter(c -> c.getId() == id).findFirst().get();
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems,  Arrays.asList("table.movie", "table.release-date")),
+                "movies", list,
+                "company", company.getName()));
+        return "company";
     }
 
     @PostMapping("/import")

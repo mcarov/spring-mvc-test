@@ -22,9 +22,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static ru.itpark.Constants.UPLOAD_PATH;
+
 @Service
 @RequiredArgsConstructor
-public class CsvFileService implements Constants {
+public class FileService {
     private final Gson gson;
 
     List<Movie> importFromCsvFile(MultipartFile file) throws IOException {

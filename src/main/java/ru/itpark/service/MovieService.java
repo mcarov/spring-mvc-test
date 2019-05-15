@@ -14,11 +14,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.itpark.Constants.LIST_SIZE;
+
 @Service
 @RequiredArgsConstructor
-public class MovieService implements Constants {
+public class MovieService {
     private final MovieRepository repository;
-    private final CsvFileService fileService;
+    private final FileService fileService;
 
     public int getRepositorySize() {
         return repository.size();

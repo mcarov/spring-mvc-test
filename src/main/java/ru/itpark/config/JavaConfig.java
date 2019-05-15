@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan("ru.itpark")
 public class JavaConfig {
+
     @Bean
     public DataSource dataSource() {
         return new JndiDataSourceLookup().getDataSource("java:comp/env/jdbc/db");

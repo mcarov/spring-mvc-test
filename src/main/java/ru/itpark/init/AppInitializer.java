@@ -3,7 +3,6 @@ package ru.itpark.init;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-import ru.itpark.Constants;
 import ru.itpark.config.JavaConfig;
 
 import javax.servlet.MultipartConfigElement;
@@ -13,8 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static javax.servlet.ServletRegistration.Dynamic;
+import static ru.itpark.Constants.UPLOAD_PATH;
 
-public class AppInitializer implements WebApplicationInitializer, Constants {
+public class AppInitializer implements WebApplicationInitializer {
 
     public AppInitializer() throws IOException {
         Files.createDirectories(Paths.get(UPLOAD_PATH));

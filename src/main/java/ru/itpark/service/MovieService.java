@@ -43,12 +43,12 @@ public class MovieService {
         return repository.getTop20OfGenre(id);
     }
 
-    public List<Movie> getMoviesOfCompany(long id) {
-        return repository.getListByCompany(id);
+    public List<Movie> getListOfCompany(long id) {
+        return repository.getListOfCompany(id);
     }
 
-    public List<Movie> getMoviesOfCollection(long id) {
-        return repository.getListByCollection(id);
+    public List<Movie> getListOfCollection(long id) {
+        return repository.getListOfCollection(id);
     }
 
     public List<Genre> getGenres() {

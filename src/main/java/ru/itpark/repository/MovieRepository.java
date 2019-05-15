@@ -169,7 +169,7 @@ public class MovieRepository {
                 Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), ",%")), movieSimpleRowMapper);
     }
 
-    public List<Movie> getListByCompany(long id) {
+    public List<Movie> getListOfCompany(long id) {
         return template.query(
                 "SELECT id, " +
                         "title, " +
@@ -181,7 +181,7 @@ public class MovieRepository {
                 Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), "}%")), movieSimpleRowMapper);
     }
 
-    public List<Movie> getListByCollection(long id) {
+    public List<Movie> getListOfCollection(long id) {
         return template.query(
                 "SELECT id, " +
                         "title, " +

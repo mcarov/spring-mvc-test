@@ -24,8 +24,8 @@ public class MovieRepository {
     private final RowMapper<Movie> movieFullRowMapper = (resultSet, i) -> {
         Movie movie = new Movie();
         movie.setBudget(resultSet.getLong(1));
-        movie.setGenres(
-                gson.fromJson(resultSet.getString(2), Genre[].class));
+//        movie.setGenres(
+//                gson.fromJson(resultSet.getString(2), Genre[].class));
         movie.setHomePage(resultSet.getString(3));
         movie.setId(resultSet.getLong(4));
         movie.setKeywords(

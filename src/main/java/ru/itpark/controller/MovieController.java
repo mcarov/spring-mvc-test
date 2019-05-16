@@ -43,11 +43,11 @@ public class MovieController {
 
     @GetMapping("/movies/page/{num}")
     public String getList(Model model, @PathVariable int num) {
-        int lastNum = (int)Math.ceil(movieService.getRepositorySize()*1.0/LIST_SIZE);
+        int lastNum = (int)Math.ceil(movieService.getMovieRepoSize()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
-                "movies", movieService.getList(num),
+                "movies", movieService.getMovies(num),
                 "page", num,
                 "last", lastNum));
         return "movies";

@@ -7,6 +7,8 @@ import ru.itpark.domain.Genre;
 import ru.itpark.domain.Keyword;
 import ru.itpark.domain.Movie;
 import ru.itpark.domain.ProductionCompany;
+import ru.itpark.repository.GenreRepository;
+import ru.itpark.repository.GenreMovieIdRepository;
 import ru.itpark.repository.MovieRepository;
 
 import java.io.IOException;
@@ -18,50 +20,57 @@ import static ru.itpark.Constants.LIST_SIZE;
 @Service
 @RequiredArgsConstructor
 public class MovieService {
-    private final MovieRepository repository;
+    private final MovieRepository movieRepository;
+    private final GenreRepository genreRepository;
+    private final GenreMovieIdRepository genreMovieIdRepository;
     private final FileService fileService;
 
-    public int getRepositorySize() {
-        return repository.size();
+    public int getMovieRepoSize() {
+        return movieRepository.size();
+    }
+
+    public int getGenreRepoSize() {
+        return genreRepository.size();
     }
 
     public Movie getById(long id) {
-        return repository.getById(id);
+        Movie movie = movieRepository.getById(id);
+
+        List<Long> genreIds = genreMovieIdRepository.getGenreIdsByMovieId(id);
+        Genre[] genres = genreIds.stream().map(genreRepository::getGenreById).collect(Collectors.toList()).toArray(Genre[]::new);
+        movie.setGenres(genres);
+
+        return movie;
     }
 
     public List<Movie> getTop20() {
-        return repository.getTop20();
+        return movieRepository.getTop20();
     }
 
-    public List<Movie> getList(int number) {
+    public List<Movie> getMovies(int number) {
         int offset = LIST_SIZE*(number-1);
-        return repository.getList(offset);
+        return movieRepository.getList(offset);
     }
 
     public List<Movie> getTop20OfGenre(long id) {
-        return repository.getTop20OfGenre(id);
+        return movieRepository.getTop20OfGenre(id);
     }
 
     public List<Movie> getListOfCompany(long id) {
-        return repository.getListOfCompany(id);
+        return movieRepository.getListOfCompany(id);
     }
 
     public List<Movie> getListOfCollection(long id) {
-        return repository.getListOfCollection(id);
+        return movieRepository.getListOfCollection(id);
     }
 
     public List<Genre> getGenres() {
-        TreeMap<Long, Genre> map = new TreeMap<>();
-        map.putAll(repository.getGenres().stream().
-                flatMap(Arrays::stream).
-                collect(Collectors.toMap(Genre::getId, genre -> genre, (key1, key2) -> key2)));
-
-        return new ArrayList<>(map.values());
+        return genreRepository.getGenres();
     }
 
     public List<ProductionCompany> getCompanies() {
         TreeMap<Long, ProductionCompany> map = new TreeMap<>();
-        map.putAll(repository.getCompanies().stream().
+        map.putAll(movieRepository.getCompanies().stream().
                 flatMap(Arrays::stream).
                 collect(Collectors.toMap(ProductionCompany::getId, company -> company, (key1, key2) -> key2)));
 
@@ -70,7 +79,7 @@ public class MovieService {
 
     public List<Keyword> getCollections() {
         List<Keyword> list = new ArrayList<>();
-        repository.getCollections().forEach(collections -> list.addAll(Arrays.asList(collections)));
+        movieRepository.getCollections().forEach(collections -> list.addAll(Arrays.asList(collections)));
 
         TreeMap<Long, Keyword> map = new TreeMap<>();
         map.putAll(list.stream().collect(Collectors.toMap(Keyword::getId, collection -> collection, (key1, key2) -> key2)));
@@ -83,9 +92,24 @@ public class MovieService {
     }
 
     public void updateFromFile(MultipartFile file) throws IOException {
-        List<Movie> movies = fileService.importFromCsvFile(file);
-        for(Movie movie : movies) {
-            repository.save(movie);
+        List<Movie> movieList = fileService.importFromCsvFile(file);
+
+        Map<Long, Movie> movieMap = movieList.stream().
+                collect(Collectors.toMap(Movie::getId, movie -> movie, (key1, key2) -> key1));
+        movieMap.forEach((id, movie) -> movieRepository.save(movie));
+
+        Map<Long, Genre> genreMap = movieMap.values().stream().
+                map(Movie::getGenres).
+                flatMap(Arrays::stream).
+                collect(Collectors.toMap(Genre::getId, genre -> genre, (key1, key2) -> key1));
+        genreMap.forEach((id, genre) -> genreRepository.save(genre));
+
+        Map<Long, Genre[]> map = movieMap.values().stream().
+                collect(Collectors.toMap(Movie::getId, Movie::getGenres));
+        for(Map.Entry<Long, Genre[]> entry : map.entrySet()) {
+            Genre[] genres = entry.getValue();
+            for(Genre genre : genres)
+                genreMovieIdRepository.save(genre.getId(), entry.getKey());
         }
     }
 

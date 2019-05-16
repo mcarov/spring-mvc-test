@@ -63,29 +63,19 @@ public class MovieController {
 
     @GetMapping("/collections/page/{num}")
     public String getCollections(Model model, @PathVariable int num) {
-        List<Keyword> collections = movieService.getCollections();
-        int lastNum = (int)Math.ceil(collections.size()*1.0/LIST_SIZE);
+        int lastNum = (int)Math.ceil(movieService.getKeywordRepoSize()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
-        if(collections.size() > 0) {
-            int firstIndex = LIST_SIZE * (num - 1);
-            int lastIndex = LIST_SIZE * num < collections.size() ? LIST_SIZE * num : collections.size();
-            model.addAllAttributes(Map.of(
-                    "translation", translatorService.translate(navbarItems, "table.collection"),
-                    "collections", collections.subList(firstIndex, lastIndex),
-                    "page", num, "last", lastNum));
-        }
-        else {
-            model.addAllAttributes(Map.of(
-                    "translation", translatorService.translate(navbarItems, "table.collection"),
-                    "collections", collections,
-                    "page", num, "last", lastNum));
-        }
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, "table.collection"),
+                "collections", movieService.getCollections(num),
+                "page", num,
+                "last", lastNum));
         return "collections";
     }
 
     @GetMapping("/collections/{id}")
     public String getListOfCollection(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getListOfCollection(id);
+        List<Movie> list = movieService.getMoviesByCollectionId(id);
         Keyword collection = Arrays.stream(list.get(0).getKeywords()).filter(k -> k.getId() == id).findFirst().get();
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
@@ -104,7 +94,7 @@ public class MovieController {
 
     @GetMapping("/genres/{id}")
     public String getTop20OfGenre(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getTop20OfGenre(id);
+        List<Movie> list = movieService.getTop20ByGenreId(id);
         Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),

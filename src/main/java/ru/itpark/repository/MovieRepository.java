@@ -28,8 +28,8 @@ public class MovieRepository {
 //                gson.fromJson(resultSet.getString(2), Genre[].class));
         movie.setHomePage(resultSet.getString(3));
         movie.setId(resultSet.getLong(4));
-        movie.setKeywords(
-                gson.fromJson(resultSet.getString(5), Keyword[].class));
+//        movie.setKeywords(
+//                gson.fromJson(resultSet.getString(5), Keyword[].class));
         movie.setOriginalLanguage(resultSet.getString(6));
         movie.setOriginalTitle(resultSet.getString(7));
         movie.setOverview(resultSet.getString(8));
@@ -145,7 +145,7 @@ public class MovieRepository {
                 movieSimpleRowMapper);
     }
 
-    public List<Movie> getList(int offset) {
+    public List<Movie> getMovies(int offset, int limit) {
         return template.query(
                 "SELECT id, " +
                         "title, " +
@@ -154,19 +154,7 @@ public class MovieRepository {
                         "genres, " +
                         "production_companies, " +
                         "keywords FROM movies ORDER BY popularity DESC LIMIT :offset, :limit",
-                Map.of("offset", offset, "limit", LIST_SIZE), movieSimpleRowMapper);
-    }
-
-    public List<Movie> getTop20OfGenre(long id) {
-        return template.query(
-                "SELECT id, " +
-                        "title, " +
-                        "popularity, " +
-                        "release_date, " +
-                        "genres, " +
-                        "production_companies, " +
-                        "keywords FROM movies WHERE genres LIKE :pattern ORDER BY popularity DESC LIMIT 20",
-                Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), ",%")), movieSimpleRowMapper);
+                Map.of("offset", offset, "limit", limit), movieSimpleRowMapper);
     }
 
     public List<Movie> getListOfCompany(long id) {
@@ -181,28 +169,8 @@ public class MovieRepository {
                 Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), "}%")), movieSimpleRowMapper);
     }
 
-    public List<Movie> getListOfCollection(long id) {
-        return template.query(
-                "SELECT id, " +
-                        "title, " +
-                        "popularity, " +
-                        "release_date, " +
-                        "genres, " +
-                        "production_companies, " +
-                        "keywords FROM movies WHERE keywords LIKE :pattern ORDER BY popularity DESC",
-                Map.of("pattern", String.join("", "%\"id\":", Long.toString(id), ",%")), movieSimpleRowMapper);
-    }
-
-    public List<Genre[]> getGenres() {
-        return template.query("SELECT genres FROM movies", genreRowMapper);
-    }
-
     public List<ProductionCompany[]> getCompanies() {
         return template.query("SELECT production_companies FROM movies", companyRowMapper);
-    }
-
-    public List<Keyword[]> getCollections() {
-        return template.query("SELECT keywords FROM movies", collectionRowMapper);
     }
 
     public void save(Movie movie) {

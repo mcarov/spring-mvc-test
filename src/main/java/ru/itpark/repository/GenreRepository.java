@@ -36,8 +36,9 @@ public class GenreRepository {
         return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM genres", Integer.class);
     }
 
-    public List<Genre> getGenres() {
-        return template.query("SELECT id, name FROM genres ORDER BY id", rowMapper);
+    public List<Genre> getGenres(int offset, int limit) {
+        return template.query("SELECT id, name FROM genres ORDER BY id LIMIT :offset, :limit",
+                Map.of("offset", offset, "limit", limit), rowMapper);
     }
 
     public Genre getGenreById(long id) {

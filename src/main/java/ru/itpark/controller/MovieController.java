@@ -37,7 +37,7 @@ public class MovieController {
     public String getTop20(Model model) {
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
-                "movies", movieService.getTop20()));
+                "movies", movieService.getMoviesTop20()));
         return "main";
     }
 
@@ -105,32 +105,22 @@ public class MovieController {
 
     @GetMapping("/companies/page/{num}")
     public String getCompanies(Model model, @PathVariable int num) {
-        List<ProductionCompany> companies = movieService.getCompanies();
-        int lastNum = (int)Math.ceil(companies.size()*1.0/LIST_SIZE);
+        int lastNum = (int)Math.ceil(movieService.getCompanyRepoSize()*1.0/LIST_SIZE);
         if(num > lastNum) num = lastNum;
-        if(companies.size() > 0) {
-            int firstIndex = LIST_SIZE*(num-1);
-            int lastIndex = LIST_SIZE*num < companies.size() ? LIST_SIZE*num : companies.size();
-            model.addAllAttributes(Map.of(
-                    "translation", translatorService.translate(navbarItems, "table.company"),
-                    "companies", companies.subList(firstIndex, lastIndex),
-                    "page", num, "last", lastNum));
-        }
-        else {
-            model.addAllAttributes(Map.of(
-                    "translation", translatorService.translate(navbarItems, "table.company"),
-                    "companies", companies,
-                    "page", num, "last", lastNum));
-        }
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(navbarItems, "table.company"),
+                "companies", movieService.getCompanies(num),
+                "page", num,
+                "last", lastNum));
         return "companies";
     }
 
     @GetMapping("/companies/{id}")
     public String getListOfCompany(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getListOfCompany(id);
+        List<Movie> list = movieService.getMoviesByCompanyId(id);
         ProductionCompany company = Arrays.stream(list.get(0).getProductionCompanies()).filter(c -> c.getId() == id).findFirst().get();
         model.addAllAttributes(Map.of(
-                "translation", translatorService.translate(navbarItems,  Arrays.asList("table.movie", "table.release-date")),
+                "translation", translatorService.translate(navbarItems, Arrays.asList("table.movie", "table.release-date")),
                 "movies", list,
                 "company", company.getName()));
         return "company";

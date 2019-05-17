@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
+import static ru.itpark.Constants.LIST_SIZE;
+
 @Repository
 public class KeywordRepository {
     private final NamedParameterJdbcTemplate template;
@@ -36,9 +38,9 @@ public class KeywordRepository {
         return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM keywords", Integer.class);
     }
 
-    public List<Keyword> getKeywords(int offset, int limit) {
+    public List<Keyword> getKeywords(int offset) {
         return template.query("SELECT id, name FROM keywords ORDER BY id LIMIT :offset, :limit",
-                Map.of("offset", offset, "limit", limit), rowMapper);
+                Map.of("offset", offset, "limit", LIST_SIZE), rowMapper);
     }
 
     public Keyword getKeywordById(long id) {

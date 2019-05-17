@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
+import static ru.itpark.Constants.LIST_SIZE;
+
 @Repository
 public class GenreRepository {
     private final NamedParameterJdbcTemplate template;
@@ -32,13 +34,9 @@ public class GenreRepository {
                 "name TEXT)");
     }
 
-    public int size() {
-        return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM genres", Integer.class);
-    }
-
-    public List<Genre> getGenres(int offset, int limit) {
+    public List<Genre> getGenres(int offset) {
         return template.query("SELECT id, name FROM genres ORDER BY id LIMIT :offset, :limit",
-                Map.of("offset", offset, "limit", limit), rowMapper);
+                Map.of("offset", offset, "limit", LIST_SIZE), rowMapper);
     }
 
     public Genre getGenreById(long id) {

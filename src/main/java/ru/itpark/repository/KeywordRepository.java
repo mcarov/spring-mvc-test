@@ -35,7 +35,12 @@ public class KeywordRepository {
     }
 
     public int size() {
-        return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM keywords", Integer.class);
+        try {
+            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM keywords", Integer.class);
+        }
+        catch(NullPointerException e) {
+            return 0;
+        }
     }
 
     public List<Keyword> getKeywords(int offset) {

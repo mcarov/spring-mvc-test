@@ -27,9 +27,10 @@ public class MovieController {
             "navbar.top-20", "navbar.movies", "navbar.collections", "navbar.genres",
             "navbar.companies", "navbar.add-movie", "navbar.choose-file", "navbar.import"));
     private final List<String> movieItems = new ArrayList<>(Arrays.asList(
+            "movie.title", "movie.tagline",
             "movie.original-title", "movie.original-language", "movie.release-date", "movie.status", "movie.runtime",
             "movie.genres", "movie.companies", "movie.countries", "movie.spoken-languages", "movie.budget",
-            "movie.revenue", "movie.homepage", "movie.popularity", "movie.votes", "movie.keywords"));
+            "movie.revenue", "movie.homepage", "movie.popularity", "movie.votes", "movie.rating", "movie.overview", "movie.keywords"));
     private final List<String> tableItems = new ArrayList<>(Arrays.asList(
             "table.movie", "table.popularity"));
 
@@ -56,7 +57,7 @@ public class MovieController {
     @GetMapping("/movies/{id}")
     public String getMovie(Model model, @PathVariable long id) {
         model.addAllAttributes(Map.of(
-                "translation", translatorService.translate(navbarItems, movieItems),
+                "translation", translatorService.translate(navbarItems, movieItems, Arrays.asList("button.edit", "button.remove")),
                 "movie", movieService.getById(id)));
         return "movie";
     }
@@ -126,17 +127,30 @@ public class MovieController {
         return "company";
     }
 
-    @GetMapping("/create")
-    public String createNewMovie(Model model) {
-        model.addAttribute("translation", translatorService.translate(navbarItems, movieItems));
-        return "create";
+    @GetMapping("**/{id}/edit")
+    public String createNewMovie(Model model, @PathVariable long id) {
+        if(id == 0) {
+            model.addAttribute("translation", translatorService.translate(navbarItems, movieItems, Collections.singletonList("button.save")));
+        }
+        else {
+            model.addAllAttributes(Map.of(
+                    "translation", translatorService.translate(navbarItems, movieItems, Collections.singletonList("button.save")),
+                    "movie", movieService.getById(id)));
+        }
+        return "edit";
     }
 
     @PostMapping("/import")
-    public String importDatabase(@RequestParam("csv-file") MultipartFile file) throws IOException {
+    public String importFromFile(@RequestParam("csv-file") MultipartFile file) throws IOException {
         if(!file.isEmpty()) {
             movieService.updateFromFile(file);
         }
+        return "redirect:/";
+    }
+
+    @PostMapping("**/{id}/save")
+    public String saveMovie(@PathVariable long id) {
+        System.out.println("saving "+id);
         return "redirect:/";
     }
 }

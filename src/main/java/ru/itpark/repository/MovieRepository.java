@@ -72,7 +72,12 @@ public class MovieRepository {
     }
 
     public int size() {
-        return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM movies", Integer.class);
+        try {
+            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM movies", Integer.class);
+        }
+        catch(NullPointerException e) {
+            return 0;
+        }
     }
 
     public Movie getMovieById(long id) {

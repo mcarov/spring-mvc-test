@@ -35,7 +35,12 @@ public class CompanyRepository {
     }
 
     public int size() {
-        return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM companies", Integer.class);
+        try {
+            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM companies", Integer.class);
+        }
+        catch(NullPointerException e) {
+            return 0;
+        }
     }
 
     public List<ProductionCompany> getCompanies(int offset) {

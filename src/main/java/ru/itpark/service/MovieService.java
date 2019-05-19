@@ -40,7 +40,7 @@ public class MovieService {
         return companyRepository.size();
     }
 
-    public Movie getById(long id) {
+    public Movie getMovieById(long id) {
         Movie movie = movieRepository.getMovieById(id);
         fillMovie(movie);
         return movie;
@@ -66,17 +66,17 @@ public class MovieService {
 
     public List<Movie> getMoviesByCollectionId(long id) {
         List<Long> movieIds = movieKeywordIdRepository.getMovieIdsByKeywordId(id);
-        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getPopularity));
+        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getPopularity), 0);
     }
 
-    public List<Movie> getTop20ByGenreId(long id) {
+    public List<Movie> getMoviesByGenreId(long id) {
         List<Long> movieIds = movieGenreIdRepository.getMovieIdsByGenreId(id);
-        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getPopularity));
+        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getPopularity), 20);
     }
 
     public List<Movie> getMoviesByCompanyId(long id) {
         List<Long> movieIds = movieCompanyIdRepository.getMovieIdsByCompanyId(id);
-        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getReleaseDate));
+        return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getReleaseDate), 0);
     }
 
     public List<ProductionCompany> getCompanies(int number) {
@@ -84,20 +84,25 @@ public class MovieService {
         return companyRepository.getCompanies(offset);
     }
 
-    public void updateFromFile(MultipartFile file) throws IOException {
+    public void updateDatabaseFromFile(MultipartFile file) throws IOException {
         Map<Long, Movie> movieMap = fileService.importFromCsvFile(file).stream().
                 collect(Collectors.toMap(Movie::getId, movie -> movie, (key1, key2) -> key1));
-        movieMap.forEach((id, movie) -> movieRepository.save(movie));
+        movieMap.forEach((id, movie) -> movieRepository.saveMovie(movie));
 
         saveDataInAdditionalTables(movieMap.values());
     }
 
-    public void save(Movie movie) {
+    public void saveMovieById(long id) {
 
     }
 
-    public void remove() {
-
+    public void removeMovieById(long id) {
+        movieRepository.removeById(id);
+        movieKeywordIdRepository.removeKeywordIdsByMovieId(id);
+        movieGenreIdRepository.removeGenreIdsByMovieId(id);
+        movieCompanyIdRepository.removeCompanyIdsByMovieId(id);
+        movieCountryIdRepository.removeCountryIsoCodesByMovieId(id);
+        movieLanguageIdRepository.removeLanguageIsoCodesByMovieId(id);
     }
 
     private void saveDataInAdditionalTables(Collection<Movie> collection) {
@@ -167,12 +172,11 @@ public class MovieService {
         }
     }
 
-    private List<Movie> getMoviesSortedList(List<Long> ids, Comparator comparator) {
+    private List<Movie> getMoviesSortedList(List<Long> ids, Comparator comparator, int limit) {
         List<Movie> movies = ids.stream().map(movieRepository::getMovieById).collect(Collectors.toList());
-        movies.forEach(movie -> fillMovie(movie));
+        movies.forEach(this::fillMovie);
         movies.sort(comparator.reversed());
-
-        return movies;
+        return limit > 0 ? movies.subList(0, limit) : movies;
     }
 
     private void fillMovie(Movie movie) {

@@ -36,4 +36,8 @@ public class MovieKeywordIdRepository {
         return template.query("SELECT movie_id FROM movie_keyword WHERE keyword_id = :id",
                 Map.of("id", id), (resultSet, i) -> resultSet.getLong(1));
     }
+
+    public void removeKeywordIdsByMovieId(long id) {
+        template.update("DELETE FROM movie_keyword WHERE movie_id = :id", Map.of("id", id));
+    }
 }

@@ -31,4 +31,8 @@ public class MovieLanguageIdRepository {
         return template.query("SELECT language_iso_code FROM movie_language WHERE movie_id = :id",
                 Map.of("id", id), (resultSet, i) -> resultSet.getString(1));
     }
+
+    public void removeLanguageIsoCodesByMovieId(long id) {
+        template.update("DELETE FROM movie_language WHERE movie_id = :id", Map.of("id", id));
+    }
 }

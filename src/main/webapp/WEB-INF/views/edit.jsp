@@ -1,7 +1,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Arrays" %>
-<%@ page import="java.util.stream.Stream" %>
 <%@ page import="ru.itpark.domain.*" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Optional" %>
@@ -45,7 +44,7 @@
                     <ul class="navbar-nav mr-auto">
                             <% if(request.getAttribute("movie") != null) { %>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="<%=request.getContextPath()%>/0/edit"><%=translated.get(5)%></a>
+                                    <a class="nav-link" href="<%=request.getContextPath()%>/movies/0/edit"><%=translated.get(5)%></a>
                                 </li>
                             <% } else { %>
                                 <li class="nav-item active">
@@ -71,7 +70,7 @@
                 if(request.getAttribute("movie") != null)
                     movie = (Movie)request.getAttribute("movie");
             %>
-            <form action="<%=request.getContextPath()%>/<%=movie.getId()%>/save" method="post">
+            <form action="<%=request.getContextPath()%>/movies/<%=movie.getId()%>/save" method="post">
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">

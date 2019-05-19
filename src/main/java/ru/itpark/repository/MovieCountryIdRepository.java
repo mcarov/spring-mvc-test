@@ -31,4 +31,8 @@ public class MovieCountryIdRepository {
         return template.query("SELECT country_iso_code FROM movie_country WHERE movie_id = :id",
                 Map.of("id", id), (resultSet, i) -> resultSet.getString(1));
     }
+
+    public void removeCountryIsoCodesByMovieId(long id) {
+        template.update("DELETE FROM movie_country WHERE movie_id = :id", Map.of("id", id));
+    }
 }

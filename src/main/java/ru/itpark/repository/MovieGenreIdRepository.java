@@ -36,4 +36,8 @@ public class MovieGenreIdRepository {
         return template.query("SELECT movie_id FROM movie_genre WHERE genre_id = :id",
                 Map.of("id", id), (resultSet, i) -> resultSet.getLong(1));
     }
+
+    public void removeGenreIdsByMovieId(long id) {
+        template.update("DELETE FROM movie_genre WHERE movie_id = :id", Map.of("id", id));
+    }
 }

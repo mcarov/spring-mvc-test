@@ -36,4 +36,8 @@ public class MovieCompanyIdRepository {
         return template.query("SELECT movie_id FROM movie_company WHERE company_id = :id",
                 Map.of("id", id), (resultSet, i) -> resultSet.getLong(1));
     }
+
+    public void removeCompanyIdsByMovieId(long id) {
+        template.update("DELETE FROM movie_company WHERE movie_id = :id", Map.of("id", id));
+    }
 }

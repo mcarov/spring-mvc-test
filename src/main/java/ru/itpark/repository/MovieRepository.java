@@ -117,7 +117,7 @@ public class MovieRepository {
                 Map.of("offset", offset, "limit", limit), simpleRowMapper);
     }
 
-    public void save(Movie movie) {
+    public void saveMovie(Movie movie) {
         template.update("INSERT INTO movies (" +
                 "budget, " +
                 "homepage, " +
@@ -140,7 +140,7 @@ public class MovieRepository {
     }
 
     public void removeById(long id) {
-
+        template.update("DELETE FROM movies WHERE id = :id", Map.of("id", id));
     }
 
     private Map<String, ?> getParamMap(Movie movie) {

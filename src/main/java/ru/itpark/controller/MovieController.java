@@ -33,6 +33,9 @@ public class MovieController {
             "movie.revenue", "movie.homepage", "movie.popularity", "movie.votes", "movie.rating", "movie.overview", "movie.keywords"));
     private final List<String> tableItems = new ArrayList<>(Arrays.asList(
             "table.movie", "table.popularity"));
+    private final List<String> deletingItems = new ArrayList<>(Arrays.asList(
+            "text.movie", "text.from", "button.yes", "button.no"
+    ));
 
     @GetMapping("/")
     public String getTop20(Model model) {
@@ -57,8 +60,8 @@ public class MovieController {
     @GetMapping("/movies/{id}")
     public String getMovie(Model model, @PathVariable long id) {
         model.addAllAttributes(Map.of(
-                "translation", translatorService.translate(navbarItems, movieItems, Arrays.asList("button.edit", "button.remove")),
-                "movie", movieService.getById(id)));
+                "translation", translatorService.translate(navbarItems, movieItems, Arrays.asList("button.edit", "button.remove", "value.time")),
+                "movie", movieService.getMovieById(id)));
         return "movie";
     }
 
@@ -95,7 +98,7 @@ public class MovieController {
 
     @GetMapping("/genres/{id}")
     public String getTop20OfGenre(Model model, @PathVariable long id) {
-        List<Movie> list = movieService.getTop20ByGenreId(id);
+        List<Movie> list = movieService.getMoviesByGenreId(id);
         Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
@@ -127,7 +130,7 @@ public class MovieController {
         return "company";
     }
 
-    @GetMapping("**/{id}/edit")
+    @GetMapping("/movies/{id}/edit")
     public String createNewMovie(Model model, @PathVariable long id) {
         if(id == 0) {
             model.addAttribute("translation", translatorService.translate(navbarItems, movieItems, Collections.singletonList("button.save")));
@@ -135,22 +138,37 @@ public class MovieController {
         else {
             model.addAllAttributes(Map.of(
                     "translation", translatorService.translate(navbarItems, movieItems, Collections.singletonList("button.save")),
-                    "movie", movieService.getById(id)));
+                    "movie", movieService.getMovieById(id)));
         }
         return "edit";
+    }
+
+    @GetMapping("/movies/{id}/remove")
+    public String removeMovieConfirm(Model model, @PathVariable long id) {
+        model.addAllAttributes(Map.of(
+                "translation", translatorService.translate(deletingItems),
+                "movie", movieService.getMovieById(id)));
+        return "remove";
     }
 
     @PostMapping("/import")
     public String importFromFile(@RequestParam("csv-file") MultipartFile file) throws IOException {
         if(!file.isEmpty()) {
-            movieService.updateFromFile(file);
+            movieService.updateDatabaseFromFile(file);
         }
         return "redirect:/";
     }
 
-    @PostMapping("**/{id}/save")
+    @PostMapping("/movies/{id}/save")
     public String saveMovie(@PathVariable long id) {
-        System.out.println("saving "+id);
+        movieService.saveMovieById(id);
+        System.out.println("saved "+id);
+        return "redirect:/";
+    }
+
+    @PostMapping("/movies/{id}/remove")
+    public String removeMovie(@PathVariable long id) {
+        movieService.removeMovieById(id);
         return "redirect:/";
     }
 }

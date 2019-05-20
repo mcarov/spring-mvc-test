@@ -92,8 +92,9 @@ public class MovieService {
         saveDataInAdditionalTables(movieMap.values());
     }
 
-    public void saveMovieById(long id) {
-
+    public void saveMovie(Movie movie) {
+        movieRepository.saveMovie(movie);
+        saveDataInAdditionalTables(Collections.singletonList(movie));
     }
 
     public void removeMovieById(long id) {

@@ -85,8 +85,8 @@
                         </div>
                         <div class="form-group">
                             <% Optional<String> originalTitle = Optional.ofNullable(movie.getOriginalTitle()); %>
-                            <label for="original-title"><%=translated.get(10)%></label>
-                            <input id="original-title" name="original-title" class="form-control" type="text" value="<%=originalTitle.orElse("")%>">
+                            <label for="original_title"><%=translated.get(10)%></label>
+                            <input id="original_title" name="original_title" class="form-control" type="text" value="<%=originalTitle.orElse("")%>">
                         </div>
                         <div class="form-group">
                             <% String lan ="";
@@ -95,8 +95,8 @@
                                     lan = loc.getDisplayLanguage(loc);
                                 }
                             %>
-                            <label for="original-language"><%=translated.get(11)%></label>
-                            <input id="original-language" name="original-language" class="form-control" type="text" value="<%=lan%>">
+                            <label for="original_language"><%=translated.get(11)%></label>
+                            <input id="original_language" name="original_language" class="form-control" type="text" value="<%=lan%>">
                         </div>
                         <div class="row">
                             <div class="col">
@@ -107,8 +107,8 @@
                                             date = dateFormat.format(movie.getReleaseDate());
                                         }
                                     %>
-                                    <label for="release-date"><%=translated.get(12)%></label>
-                                    <input id="release-date" name="release-date" class="form-control" type="text" value="<%=date%>">
+                                    <label for="date"><%=translated.get(12)%></label>
+                                    <input id="date" name="date" class="form-control" type="text" value="<%=date%>">
                                 </div>
                             </div>
                             <div class="col">
@@ -167,8 +167,8 @@
                                     languageNames = String.join(", ", namesArray);
                                 }
                             %>
-                            <label for="spoken-languages"><%=translated.get(18)%></label>
-                            <input id="spoken-languages" name="spoken-languages" class="form-control" type="text" value="<%=languageNames%>">
+                            <label for="languages"><%=translated.get(18)%></label>
+                            <input id="languages" name="languages" class="form-control" type="text" value="<%=languageNames%>">
                         </div>
                         <div class="row">
                             <div class="col">
@@ -187,7 +187,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <% Optional<String> homepage = Optional.ofNullable(movie.getHomePage()); %>
+                            <% Optional<String> homepage = Optional.ofNullable(movie.getHomepage()); %>
                             <label for="homepage"><%=translated.get(21)%></label>
                             <input id="homepage" name="homepage" class="form-control" type="text" value="<%=homepage.orElse("")%>">
                         </div>
@@ -196,7 +196,7 @@
                                 <div class="form-group">
                                     <% double popularity = movie.getPopularity(); %>
                                     <label for="popularity"><%=translated.get(22)%></label>
-                                    <input id="popularity" name="popularity" class="form-control" type="text" value="<%=(popularity == 0 ? "" : String.format("%.3f", popularity))%>">
+                                    <input id="popularity" name="popularity" class="form-control" type="text" value="<%=(popularity == 0 ? "" : popularity)%>">
                                 </div>
                             </div>
                             <div class="col">

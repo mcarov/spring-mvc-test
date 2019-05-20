@@ -54,7 +54,14 @@ public class KeywordRepository {
     }
 
     public void save(Keyword keyword) {
-        template.update("INSERT INTO keywords (id, name) VALUES (:id, :name)",
-                Map.of("id", keyword.getId(), "name", keyword.getName()));
+        if(keyword.getId() == 0) {
+            template.update("INSERT INTO keywords (id, name) VALUES (:id, :name)",
+                    Map.of("id", keyword.getId(), "name", keyword.getName()));
+        }
+        else {
+            template.update("INSERT INTO keywords (id, name) VALUES (:id, :name) " +
+                            "ON CONFLICT(id) DO UPDATE SET name = :name WHERE id = :id",
+                    Map.of("id", keyword.getId(), "name", keyword.getName()));
+        }
     }
 }

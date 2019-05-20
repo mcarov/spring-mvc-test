@@ -9,6 +9,7 @@ import ru.itpark.domain.Genre;
 import ru.itpark.domain.Keyword;
 import ru.itpark.domain.Movie;
 import ru.itpark.domain.ProductionCompany;
+import ru.itpark.model.MovieModel;
 import ru.itpark.service.MovieService;
 import ru.itpark.service.TranslatorService;
 
@@ -160,10 +161,10 @@ public class MovieController {
     }
 
     @PostMapping("/movies/{id}/save")
-    public String saveMovie(@PathVariable long id) {
-        movieService.saveMovieById(id);
-        System.out.println("saved "+id);
-        return "redirect:/";
+    public String saveMovie(@PathVariable long id, @ModelAttribute MovieModel model) {
+        model.setId(id);
+        System.out.println(model);
+        return id == 0 ? "redirect:/" : String.join("/","redirect:", "movies", String.valueOf(id));
     }
 
     @PostMapping("/movies/{id}/remove")

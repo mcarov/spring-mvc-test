@@ -28,7 +28,7 @@ public class LanguageRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS languages(" +
-                "iso_639_1 TEXT," +
+                "iso_639_1 TEXT PRIMARY KEY," +
                 "name TEXT)");
     }
 
@@ -37,8 +37,9 @@ public class LanguageRepository {
         return list.get(0);
     }
 
-    public void save(SpokenLanguage spokenLanguage) {
-        template.update("INSERT INTO languages (iso_639_1, name) VALUES (:isoCode, :name)",
-                Map.of("isoCode", spokenLanguage.getIso_639_1(), "name", spokenLanguage.getName()));
+    public void save(SpokenLanguage language) {
+        template.update("INSERT INTO languages (iso_639_1, name) VALUES (:isoCode, :name) " +
+                        "ON CONFLICT(iso_639_1) DO UPDATE SET name = :name WHERE iso_639_1 = :isoCode",
+                Map.of("isoCode", language.getIso_639_1(), "name", language.getName()));
     }
 }

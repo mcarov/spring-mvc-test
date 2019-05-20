@@ -28,7 +28,7 @@ public class CountryRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS countries(" +
-                "iso_3166_1 TEXT," +
+                "iso_3166_1 TEXT PRIMARY KEY," +
                 "name TEXT)");
     }
 
@@ -37,8 +37,9 @@ public class CountryRepository {
         return list.get(0);
     }
 
-    public void save(ProductionCountry productionCountry) {
-        template.update("INSERT INTO countries (iso_3166_1, name) VALUES (:isoCode, :name)",
-                Map.of("isoCode", productionCountry.getIso_3166_1(), "name", productionCountry.getName()));
+    public void save(ProductionCountry country) {
+        template.update("INSERT INTO countries (iso_3166_1, name) VALUES (:isoCode, :name) " +
+                        "ON CONFLICT(iso_3166_1) DO UPDATE SET name = :name WHERE iso_3166_1 = :isoCode",
+                Map.of("isoCode", country.getIso_3166_1(), "name", country.getName()));
     }
 }

@@ -21,7 +21,7 @@ public class MovieRepository {
     private final RowMapper<Movie> fullRowMapper = (resultSet, i) -> {
         Movie movie = new Movie();
         movie.setBudget(resultSet.getLong(1));
-        movie.setHomePage(resultSet.getString(2));
+        movie.setHomepage(resultSet.getString(2));
         movie.setId(resultSet.getLong(3));
         movie.setOriginalLanguage(resultSet.getString(4));
         movie.setOriginalTitle(resultSet.getString(5));
@@ -118,25 +118,54 @@ public class MovieRepository {
     }
 
     public void saveMovie(Movie movie) {
-        template.update("INSERT INTO movies (" +
-                "budget, " +
-                "homepage, " +
-                "id, " +
-                "original_language, " +
-                "original_title, " +
-                "overview, " +
-                "popularity, " +
-                "release_date, " +
-                "revenue, " +
-                "runtime, " +
-                "status, " +
-                "tagline, " +
-                "title, " +
-                "vote_average, " +
-                "vote_count) " +
-                "VALUES (:budget, :homepage, :id, :original_language, :original_title, " +
-                ":overview, :popularity, :release_date, :revenue, :runtime," +
-                ":status, :tagline, :title, :vote_average, :vote_count)", getParamMap(movie));
+        if(movie.getId() == 0) {
+            template.update("INSERT INTO movies (" +
+                    "budget, " +
+                    "homepage, " +
+                    "id, " +
+                    "original_language, " +
+                    "original_title, " +
+                    "overview, " +
+                    "popularity, " +
+                    "release_date, " +
+                    "revenue, " +
+                    "runtime, " +
+                    "status, " +
+                    "tagline, " +
+                    "title, " +
+                    "vote_average, " +
+                    "vote_count) " +
+                    "VALUES (:budget, :homepage, :id, :original_language, :original_title, " +
+                    ":overview, :popularity, :release_date, :revenue, :runtime, " +
+                    ":status, :tagline, :title, :vote_average, :vote_count)", getParamMap(movie));
+        }
+        else {
+            template.update("INSERT INTO movies (" +
+                    "budget, " +
+                    "homepage, " +
+                    "id, " +
+                    "original_language, " +
+                    "original_title, " +
+                    "overview, " +
+                    "popularity, " +
+                    "release_date, " +
+                    "revenue, " +
+                    "runtime, " +
+                    "status, " +
+                    "tagline, " +
+                    "title, " +
+                    "vote_average, " +
+                    "vote_count) " +
+                    "VALUES (:budget, :homepage, :id, :original_language, :original_title, " +
+                    ":overview, :popularity, :release_date, :revenue, :runtime, " +
+                    ":status, :tagline, :title, :vote_average, :vote_count) " +
+                    "ON CONFLICT(id) DO UPDATE SET " +
+                    "budget = :budget, homepage = :homepage, original_language = :original_language, " +
+                    "original_title = :original_title, overview = :overview, popularity = :popularity, " +
+                    "release_date = :release_date, revenue = :revenue, runtime = :runtime, " +
+                    "status = :status, tagline = :tagline, title = :title, " +
+                    "vote_average = :vote_average, vote_count = :vote_count", getParamMap(movie));
+        }
     }
 
     public void removeById(long id) {
@@ -146,7 +175,7 @@ public class MovieRepository {
     private Map<String, ?> getParamMap(Movie movie) {
         return Map.ofEntries(
                 entry("budget", movie.getBudget()),
-                entry("homepage", movie.getHomePage()),
+                entry("homepage", movie.getHomepage()),
                 entry("id", movie.getId()),
                 entry("original_language", movie.getOriginalLanguage()),
                 entry("original_title", movie.getOriginalTitle()),

@@ -50,7 +50,7 @@ public class FileService {
         movie.setBudget(Long.parseLong(record.get("budget")));
         movie.setGenres(
                 gson.fromJson(record.get("genres"), Genre[].class));
-        movie.setHomePage(record.get("homepage"));
+        movie.setHomepage(record.get("homepage"));
         movie.setId(Long.parseLong(record.get("id")));
         movie.setKeywords(
                 gson.fromJson(record.get("keywords"), Keyword[].class));

@@ -1,7 +1,6 @@
 package ru.itpark.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,12 +8,11 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @SuppressFBWarnings("EI_EXPOSE_REP")
 public class Movie {
     private long budget;
     private Genre[] genres;
-    private String homePage;
+    private String homepage;
     private long id;
     private Keyword[] keywords;
     private String originalLanguage;

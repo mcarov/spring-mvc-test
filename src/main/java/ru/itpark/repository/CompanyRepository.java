@@ -53,8 +53,15 @@ public class CompanyRepository {
         return list.get(0);
     }
 
-    public void save(ProductionCompany productionCompany) {
-        template.update("INSERT INTO companies (id, name) VALUES (:id, :name)",
-                Map.of("id", productionCompany.getId(), "name", productionCompany.getName()));
+    public void save(ProductionCompany company) {
+        if(company.getId() == 0) {
+            template.update("INSERT INTO companies (id, name) VALUES (:id, :name)",
+                    Map.of("id", company.getId(), "name", company.getName()));
+        }
+        else {
+            template.update("INSERT INTO companies (id, name) VALUES (:id, :name) " +
+                            "ON CONFLICT(id) DO UPDATE SET name = :name WHERE id = :id",
+                    Map.of("id", company.getId(), "name", company.getName()));
+        }
     }
 }

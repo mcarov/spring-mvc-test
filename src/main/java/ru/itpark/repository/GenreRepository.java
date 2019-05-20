@@ -45,7 +45,14 @@ public class GenreRepository {
     }
 
     public void save(Genre genre) {
-        template.update("INSERT INTO genres (id, name) VALUES (:id, :name)",
-                Map.of("id", genre.getId(), "name", genre.getName()));
+        if(genre.getId() == 0) {
+            template.update("INSERT INTO genres (id, name) VALUES (:id, :name)",
+                    Map.of("id", genre.getId(), "name", genre.getName()));
+        }
+        else {
+            template.update("INSERT INTO genres (id, name) VALUES (:id, :name) " +
+                            "ON CONFLICT(id) DO UPDATE SET name = :name WHERE id = :id",
+                    Map.of("id", genre.getId(), "name", genre.getName()));
+        }
     }
 }

@@ -42,4 +42,8 @@ public class CountryRepository {
                         "ON CONFLICT(iso_3166_1) DO UPDATE SET name = :name WHERE iso_3166_1 = :isoCode",
                 Map.of("isoCode", country.getIso_3166_1(), "name", country.getName()));
     }
+
+    public void removeCountryByIsoCode(String isoCode) {
+        template.update("DELETE FROM countries WHERE iso_3166_1 LIKE :isoCode", Map.of("isoCode", isoCode));
+    }
 }

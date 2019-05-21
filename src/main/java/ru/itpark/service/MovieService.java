@@ -28,15 +28,15 @@ public class MovieService {
     private final LanguageRepository languageRepository;
     private final FileService fileService;
 
-    public int getMovieRepoSize() {
+    public long getMovieRepoSize() {
         return movieRepository.size();
     }
 
-    public int getKeywordRepoSize() {
+    public long getKeywordRepoSize() {
         return keywordRepository.size();
     }
 
-    public int getCompanyRepoSize() {
+    public long getCompanyRepoSize() {
         return companyRepository.size();
     }
 
@@ -99,11 +99,47 @@ public class MovieService {
 
     public void removeMovieById(long id) {
         movieRepository.removeById(id);
+        long count = 0;
+
+        List<Long> keywordIds = movieKeywordIdRepository.getKeywordIdsByMovieId(id);
         movieKeywordIdRepository.removeKeywordIdsByMovieId(id);
+        for(Long keywordId : keywordIds) {
+            count = movieKeywordIdRepository.countKeywordId(keywordId);
+            if(count == 0)
+                keywordRepository.removeKeywordById(keywordId);
+        }
+
+        List<Long> genreIds = movieGenreIdRepository.getGenreIdsByMovieId(id);
         movieGenreIdRepository.removeGenreIdsByMovieId(id);
+        for(Long genreId : genreIds) {
+            count = movieGenreIdRepository.countGenreId(genreId);
+            if(count == 0)
+                genreRepository.removeGenreById(genreId);
+        }
+
+        List<Long> companyIds = movieCompanyIdRepository.getCompanyIdsByMovieId(id);
         movieCompanyIdRepository.removeCompanyIdsByMovieId(id);
+        for(Long companyId : companyIds) {
+            count = movieCompanyIdRepository.countCompanyId(companyId);
+            if(count == 0)
+                companyRepository.removeCompanyById(companyId);
+        }
+
+        List<String> countryIsoCodes = movieCountryIdRepository.getCountryIsoCodesByMovieId(id);
         movieCountryIdRepository.removeCountryIsoCodesByMovieId(id);
+        for(String isoCode : countryIsoCodes) {
+            count = movieCountryIdRepository.countContryIsoCode(isoCode);
+            if(count == 0)
+                countryRepository.removeCountryByIsoCode(isoCode);
+        }
+
+        List<String> languageIsoCodes = movieLanguageIdRepository.getLanguageIsoCodesByMovieId(id);
         movieLanguageIdRepository.removeLanguageIsoCodesByMovieId(id);
+        for(String isoCode : languageIsoCodes) {
+            count = movieLanguageIdRepository.countLanguageIsoCode(isoCode);
+            if(count == 0)
+                languageRepository.removeLanguageByIsoCode(isoCode);
+        }
     }
 
     private void saveDataInAdditionalTables(Collection<Movie> collection) {

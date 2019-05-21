@@ -42,4 +42,8 @@ public class LanguageRepository {
                         "ON CONFLICT(iso_639_1) DO UPDATE SET name = :name WHERE iso_639_1 = :isoCode",
                 Map.of("isoCode", language.getIso_639_1(), "name", language.getName()));
     }
+
+    public void removeLanguageByIsoCode(String isoCode) {
+        template.update("DELETE FROM languages WHERE iso_639_1 LIKE :isoCode", Map.of("isoCode", isoCode));
+    }
 }

@@ -78,7 +78,6 @@ public class MovieModel {
     }
 
     private Stream<String> getStringStream(String line) {
-        String regex = "[,.;:]";
-        return Arrays.stream(line.split(regex)).map(String::trim).filter(s -> !s.equals(""));
+        return Arrays.stream(line.split("[,;]")).map(String::trim);
     }
 }

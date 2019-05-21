@@ -55,4 +55,8 @@ public class GenreRepository {
                     Map.of("id", genre.getId(), "name", genre.getName()));
         }
     }
+
+    public void removeGenreById(long id) {
+        template.update("DELETE FROM genres WHERE id = :id", Map.of("id", id));
+    }
 }

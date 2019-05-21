@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class MovieKeywordIdRepository {
@@ -20,6 +21,12 @@ public class MovieKeywordIdRepository {
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS movie_keyword(" +
                 "movie_id INTEGER, keyword_id INTEGER)");
+    }
+
+    public long countKeywordId(long id) {
+        Optional<Long> count = Optional.ofNullable(template.getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM movie_keyword WHERE keyword_id = ?", new Long[]{id}, Long.class));
+        return count.orElse(0L);
     }
 
     public void save(long movieId, long keywordId) {

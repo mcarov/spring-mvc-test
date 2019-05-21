@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static ru.itpark.Constants.LIST_SIZE;
 
@@ -34,13 +35,9 @@ public class KeywordRepository {
                 "name TEXT)");
     }
 
-    public int size() {
-        try {
-            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM keywords", Integer.class);
-        }
-        catch(NullPointerException e) {
-            return 0;
-        }
+    public long size() {
+        Optional<Long> size = Optional.ofNullable(template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM keywords", Long.class));
+        return size.orElse(0L);
     }
 
     public List<Keyword> getKeywords(int offset) {
@@ -63,5 +60,9 @@ public class KeywordRepository {
                             "ON CONFLICT(id) DO UPDATE SET name = :name WHERE id = :id",
                     Map.of("id", keyword.getId(), "name", keyword.getName()));
         }
+    }
+
+    public void removeKeywordById(long id) {
+        template.update("DELETE FROM keywords WHERE id = :id", Map.of("id", id));
     }
 }

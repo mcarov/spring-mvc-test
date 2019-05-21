@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static ru.itpark.Constants.LIST_SIZE;
 
@@ -34,13 +35,9 @@ public class CompanyRepository {
                 "name TEXT)");
     }
 
-    public int size() {
-        try {
-            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM companies", Integer.class);
-        }
-        catch(NullPointerException e) {
-            return 0;
-        }
+    public long size() {
+        Optional<Long> size = Optional.ofNullable(template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM companies", Long.class));
+        return size.orElse(0L);
     }
 
     public List<ProductionCompany> getCompanies(int offset) {
@@ -63,5 +60,9 @@ public class CompanyRepository {
                             "ON CONFLICT(id) DO UPDATE SET name = :name WHERE id = :id",
                     Map.of("id", company.getId(), "name", company.getName()));
         }
+    }
+
+    public void removeCompanyById(long id) {
+        template.update("DELETE FROM companies WHERE id = :id", Map.of("id", id));
     }
 }

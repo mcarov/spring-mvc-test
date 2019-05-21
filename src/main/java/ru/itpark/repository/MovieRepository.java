@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Map.entry;
 
@@ -71,13 +72,9 @@ public class MovieRepository {
                 "vote_count INTEGER)");
     }
 
-    public int size() {
-        try {
-            return template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM movies", Integer.class);
-        }
-        catch(NullPointerException e) {
-            return 0;
-        }
+    public long size() {
+        Optional<Long> size = Optional.ofNullable(template.getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM movies", Long.class));
+        return size.orElse(0L);
     }
 
     public Movie getMovieById(long id) {

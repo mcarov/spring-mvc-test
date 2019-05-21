@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class MovieLanguageIdRepository {
@@ -20,6 +21,12 @@ public class MovieLanguageIdRepository {
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS movie_language(" +
                 "movie_id INTEGER, language_iso_code TEXT)");
+    }
+
+    public long countLanguageIsoCode(String isoCode) {
+        Optional<Long> count = Optional.ofNullable(template.getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM movie_language WHERE language_iso_code LIKE ?", new String[]{isoCode}, Long.class));
+        return count.orElse(0L);
     }
 
     public void save(long movieId, String isoCode) {

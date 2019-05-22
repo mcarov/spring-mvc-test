@@ -37,9 +37,9 @@ public class CountryRepository {
     }
 
     public String getCountryIsoCodeByName(String name) {
-        List<String> list = template.query("SELECT iso_3166_1 FROM countries WHERE name LIKE :name",
+        List<String> countryList = template.query("SELECT iso_3166_1 FROM countries WHERE name LIKE :name",
                 Map.of("name", name), (resultSet, i) -> resultSet.getString(1));
-        return list.isEmpty() ? "" : list.get(0);
+        return countryList.isEmpty() ? "" : countryList.get(0);
     }
 
     public void saveCountry(ProductionCountry country) {

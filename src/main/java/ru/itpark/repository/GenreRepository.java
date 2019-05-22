@@ -45,9 +45,9 @@ public class GenreRepository {
     }
 
     public long getGenreIdByName(String name) {
-        List<Long> list = template.query("SELECT id FROM genres WHERE name LIKE :name",
+        List<Long> genreList = template.query("SELECT id FROM genres WHERE name LIKE :name",
                 Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
-        return list.isEmpty() ? 0 : list.get(0);
+        return genreList.isEmpty() ? 0 : genreList.get(0);
     }
 
     public void saveGenre(Genre genre) {
@@ -55,9 +55,9 @@ public class GenreRepository {
             template.update("INSERT INTO genres (name) VALUES (:name)",
                     Map.of("name", genre.getName()));
 
-            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+            Optional<Long> genreId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            genre.setId(optional.get());
+            genre.setId(genreId.get());
         }
         else {
             template.update("INSERT INTO genres (id, name) VALUES (:id, :name) " +

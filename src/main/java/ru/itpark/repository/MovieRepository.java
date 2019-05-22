@@ -135,9 +135,9 @@ public class MovieRepository {
                     ":overview, :popularity, :release_date, :revenue, :runtime, " +
                     ":status, :tagline, :title, :vote_average, :vote_count)", getParamMap(movie));
 
-            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+            Optional<Long> movieId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            movie.setId(optional.get());
+            movie.setId(movieId.get());
         }
         else {
             template.update("INSERT INTO movies (" +

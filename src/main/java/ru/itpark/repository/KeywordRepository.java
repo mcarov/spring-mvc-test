@@ -50,9 +50,9 @@ public class KeywordRepository {
     }
 
     public long getKeywordIdByName(String name) {
-        List<Long> list = template.query("SELECT id FROM keywords WHERE name LIKE :name",
+        List<Long> keywordList = template.query("SELECT id FROM keywords WHERE name LIKE :name",
                 Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
-        return list.isEmpty() ? 0 : list.get(0);
+        return keywordList.isEmpty() ? 0 : keywordList.get(0);
     }
 
     public void saveKeyword(Keyword keyword) {
@@ -60,9 +60,9 @@ public class KeywordRepository {
             template.update("INSERT INTO keywords (name) VALUES (:name)",
                     Map.of("name", keyword.getName()));
 
-            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+            Optional<Long> keywordId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            keyword.setId(optional.get());
+            keyword.setId(keywordId.get());
         }
         else {
             template.update("INSERT INTO keywords (id, name) VALUES (:id, :name) " +

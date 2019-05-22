@@ -50,9 +50,9 @@ public class CompanyRepository {
     }
 
     public long getCompanyIdByName(String name) {
-        List<Long> list = template.query("SELECT id FROM companies WHERE name LIKE :name",
+        List<Long> companylist = template.query("SELECT id FROM companies WHERE name LIKE :name",
                 Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
-        return list.isEmpty() ? 0 : list.get(0);
+        return companylist.isEmpty() ? 0 : companylist.get(0);
     }
 
     public void saveCompany(ProductionCompany company) {
@@ -60,9 +60,9 @@ public class CompanyRepository {
             template.update("INSERT INTO companies (name) VALUES (:name)",
                     Map.of("name", company.getName()));
 
-            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+            Optional<Long> companyId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            company.setId(optional.get());
+            company.setId(companyId.get());
         }
         else {
             template.update("INSERT INTO companies (id, name) VALUES (:id, :name) " +

@@ -168,9 +168,9 @@ public class MovieService {
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
         keywordList.forEach(keywordRepository::saveKeyword);
-        Map<Long, Keyword[]> map1 = collection.stream().
+        Map<Long, Keyword[]> keywordMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getKeywords));
-        for(Map.Entry<Long, Keyword[]> entry : map1.entrySet()) {
+        for(Map.Entry<Long, Keyword[]> entry : keywordMap.entrySet()) {
             Keyword[] keywords = entry.getValue();
             for(Keyword keyword : keywords)
                 movieKeywordIdRepository.save(entry.getKey(), keyword.getId());
@@ -181,9 +181,9 @@ public class MovieService {
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
         genreList.forEach(genreRepository::saveGenre);
-        Map<Long, Genre[]> map2 = collection.stream().
+        Map<Long, Genre[]> genreMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getGenres));
-        for(Map.Entry<Long, Genre[]> entry : map2.entrySet()) {
+        for(Map.Entry<Long, Genre[]> entry : genreMap.entrySet()) {
             Genre[] genres = entry.getValue();
             for(Genre genre : genres)
                 movieGenreIdRepository.save(entry.getKey(), genre.getId());
@@ -194,8 +194,9 @@ public class MovieService {
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
         companyList.forEach(companyRepository::saveCompany);
-        Map<Long, ProductionCompany[]> map3 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getProductionCompanies));
-        for(Map.Entry<Long, ProductionCompany[]> entry : map3.entrySet()) {
+        Map<Long, ProductionCompany[]> companyMap = collection.stream().
+                collect(Collectors.toMap(Movie::getId, Movie::getProductionCompanies));
+        for(Map.Entry<Long, ProductionCompany[]> entry : companyMap.entrySet()) {
             ProductionCompany[] companies = entry.getValue();
             for(ProductionCompany company : companies) {
                 movieCompanyIdRepository.save(entry.getKey(), company.getId());
@@ -207,8 +208,9 @@ public class MovieService {
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
         countryList.forEach(countryRepository::saveCountry);
-        Map<Long, ProductionCountry[]> map4 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getProductionCountries));
-        for(Map.Entry<Long, ProductionCountry[]> entry : map4.entrySet()) {
+        Map<Long, ProductionCountry[]> countryMap = collection.stream().
+                collect(Collectors.toMap(Movie::getId, Movie::getProductionCountries));
+        for(Map.Entry<Long, ProductionCountry[]> entry : countryMap.entrySet()) {
             ProductionCountry[] countries = entry.getValue();
             for(ProductionCountry country : countries) {
                 movieCountryIdRepository.save(entry.getKey(), country.getIso_3166_1());
@@ -220,8 +222,9 @@ public class MovieService {
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
         languageList.forEach(languageRepository::saveLanguage);
-        Map<Long, SpokenLanguage[]> map5 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getSpokenLanguages));
-        for(Map.Entry<Long, SpokenLanguage[]> entry : map5.entrySet()) {
+        Map<Long, SpokenLanguage[]> languageMap = collection.stream().
+                collect(Collectors.toMap(Movie::getId, Movie::getSpokenLanguages));
+        for(Map.Entry<Long, SpokenLanguage[]> entry : languageMap.entrySet()) {
             SpokenLanguage[] languages = entry.getValue();
             for(SpokenLanguage language : languages) {
                 movieLanguageIdRepository.save(entry.getKey(), language.getIso_639_1());

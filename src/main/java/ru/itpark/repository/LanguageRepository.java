@@ -37,9 +37,9 @@ public class LanguageRepository {
     }
 
     public String getLanguageIsoCodeByName(String name) {
-        List<String> list = template.query("SELECT iso_639_1 FROM languages WHERE name LIKE :name",
+        List<String> languageList = template.query("SELECT iso_639_1 FROM languages WHERE name LIKE :name",
                 Map.of("name", name), (resultSet, i) -> resultSet.getString(1));
-        return list.isEmpty() ? "" : list.get(0);
+        return languageList.isEmpty() ? "" : languageList.get(0);
     }
 
     public void saveLanguage(SpokenLanguage language) {

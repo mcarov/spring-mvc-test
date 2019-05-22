@@ -103,8 +103,7 @@
             <td>
                 <% for(int i = 0; i < genres.length; i++) {
                     Genre genre = genres[i]; %>
-                <a href="<%=request.getContextPath()%>/genres/<%=genre.getId()%>"><%=genre.getName()%></a>
-                <% if(i < genres.length-1) %>,
+                <a href="<%=request.getContextPath()%>/genres/<%=genre.getId()%>"><%=genre.getName()%></a><% if(i < genres.length-1) %>,
                 <% } %>
             </td>
         </tr>
@@ -114,8 +113,7 @@
             <td>
                 <% for(int i = 0; i < companies.length; i++) {
                     ProductionCompany company = companies[i]; %>
-                <a href="<%=request.getContextPath()%>/companies/<%=company.getId()%>"><%=company.getName()%></a>
-                <% if(i < companies.length-1) %>,
+                <a href="<%=request.getContextPath()%>/companies/<%=company.getId()%>"><%=company.getName()%></a><% if(i < companies.length-1) %>,
                 <% } %>
             </td>
         </tr>
@@ -125,8 +123,7 @@
             <td>
                 <% for(int i = 0; i < countries.length; i++) {
                     ProductionCountry country = countries[i]; %>
-                <%=country.getName()%>
-                <% if(i < countries.length-1) %>,
+                <%=country.getName()%><% if(i < countries.length-1) %>,
                 <% } %>
             </td>
         </tr>
@@ -136,18 +133,17 @@
             <td>
                 <% for(int i = 0; i < languages.length; i++) {
                     SpokenLanguage language = languages[i]; %>
-                <%=language.getName()%>
-                <% if(i < languages.length-1) %>,
+                <%=language.getName()%><% if(i < languages.length-1) %>,
                 <% } %>
             </td>
         </tr>
         <tr>
             <td><%=translated.get(19)%></td>
-            <td><%=movie.getBudget()%> $</td>
+            <td><%=movie.getBudget()%>$</td>
         </tr>
         <tr>
             <td><%=translated.get(20)%></td>
-            <td><%=movie.getRevenue()%> $</td>
+            <td><%=movie.getRevenue()%>$</td>
         </tr>
         <tr>
             <td><%=translated.get(21)%></td>
@@ -190,8 +186,7 @@
             <td>
                 <% for(int i = 0; i < keywords.length; i++) { %>
                 <% Keyword keyword = keywords[i]; %>
-                <a href="<%=request.getContextPath()%>/collections/<%=keyword.getId()%>"><%=keyword.getName()%></a>
-                <% if(i < keywords.length-1) %>,
+                <a href="<%=request.getContextPath()%>/collections/<%=keyword.getId()%>"><%=keyword.getName()%></a><% if(i < keywords.length-1) %>,
                 <% } %>
             </td>
         </tr>

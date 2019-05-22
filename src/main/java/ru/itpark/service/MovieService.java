@@ -84,6 +84,18 @@ public class MovieService {
         return companyRepository.getCompanies(offset);
     }
 
+    public Genre getGenreById(long id) {
+        return genreRepository.getGenreById(id);
+    }
+
+    public Keyword getKeywordById(long id) {
+        return keywordRepository.getKeywordById(id);
+    }
+
+    public ProductionCompany getCompanyById(long id) {
+        return companyRepository.getCompanyById(id);
+    }
+
     public void updateDatabaseFromFile(MultipartFile file) throws IOException {
         Map<Long, Movie> movieMap = fileService.importFromCsvFile(file).stream().
                 collect(Collectors.toMap(Movie::getId, movie -> movie, (key1, key2) -> key1));

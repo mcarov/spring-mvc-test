@@ -81,7 +81,7 @@ public class MovieController {
     @GetMapping("/collections/{id}")
     public String getListOfCollection(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getMoviesByCollectionId(id);
-        Keyword collection = Arrays.stream(list.get(0).getKeywords()).filter(k -> k.getId() == id).findFirst().get();
+        Keyword collection = movieService.getKeywordById(id);
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
                 "movies", list,
@@ -100,7 +100,7 @@ public class MovieController {
     @GetMapping("/genres/{id}")
     public String getTop20OfGenre(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getMoviesByGenreId(id);
-        Genre genre = Arrays.stream(list.get(0).getGenres()).filter(g -> g.getId() == id).findFirst().get();
+        Genre genre = movieService.getGenreById(id);
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, tableItems),
                 "movies", list,
@@ -123,7 +123,7 @@ public class MovieController {
     @GetMapping("/companies/{id}")
     public String getListOfCompany(Model model, @PathVariable long id) {
         List<Movie> list = movieService.getMoviesByCompanyId(id);
-        ProductionCompany company = Arrays.stream(list.get(0).getProductionCompanies()).filter(c -> c.getId() == id).findFirst().get();
+        ProductionCompany company = movieService.getCompanyById(id);
         model.addAllAttributes(Map.of(
                 "translation", translatorService.translate(navbarItems, Arrays.asList("table.movie", "table.release-date")),
                 "movies", list,

@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static ru.itpark.Constants.LIST_SIZE;
 
@@ -30,7 +31,7 @@ public class GenreRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS genres(" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT)");
     }
 
@@ -40,14 +41,23 @@ public class GenreRepository {
     }
 
     public Genre getGenreById(long id) {
-        List<Genre> list = template.query("SELECT id, name FROM genres WHERE id = :id", Map.of("id", id), rowMapper);
-        return list.get(0);
+        return template.queryForObject("SELECT id, name FROM genres WHERE id = :id", Map.of("id", id), rowMapper);
     }
 
-    public void save(Genre genre) {
+    public long getGenreIdByName(String name) {
+        List<Long> list = template.query("SELECT id FROM genres WHERE name LIKE :name",
+                Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
+        return list.isEmpty() ? 0 : list.get(0);
+    }
+
+    public void saveGenre(Genre genre) {
         if(genre.getId() == 0) {
-            template.update("INSERT INTO genres (id, name) VALUES (:id, :name)",
-                    Map.of("id", genre.getId(), "name", genre.getName()));
+            template.update("INSERT INTO genres (name) VALUES (:name)",
+                    Map.of("name", genre.getName()));
+
+            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+                    queryForObject("SELECT last_insert_rowid()", Long.class));
+            genre.setId(optional.get());
         }
         else {
             template.update("INSERT INTO genres (id, name) VALUES (:id, :name) " +

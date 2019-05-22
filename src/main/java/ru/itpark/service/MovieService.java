@@ -42,7 +42,7 @@ public class MovieService {
 
     public Movie getMovieById(long id) {
         Movie movie = movieRepository.getMovieById(id);
-        fillMovie(movie);
+        addDataFromAdditionalTables(movie);
         return movie;
     }
 
@@ -93,6 +93,7 @@ public class MovieService {
     }
 
     public void saveMovie(Movie movie) {
+        searchIdsAndIsoCodes(movie);
         movieRepository.saveMovie(movie);
         saveDataInAdditionalTables(Collections.singletonList(movie));
     }
@@ -142,12 +143,31 @@ public class MovieService {
         }
     }
 
+    private void searchIdsAndIsoCodes(Movie movie) {
+        Arrays.asList(movie.getKeywords()).
+                forEach(keyword -> keyword.setId(keywordRepository.getKeywordIdByName(keyword.getName())));
+        Arrays.asList(movie.getGenres()).
+                forEach(genre -> genre.setId(genreRepository.getGenreIdByName(genre.getName())));
+        Arrays.asList(movie.getProductionCompanies()).
+                forEach(company -> company.setId(companyRepository.getCompanyIdByName(company.getName())));
+        Arrays.asList(movie.getProductionCountries()).
+                forEach(country -> {
+                    if(country.getIso_3166_1().equals(""))
+                        country.setIso_3166_1(countryRepository.getCountryIsoCodeByName(country.getName()));
+                });
+        Arrays.asList(movie.getSpokenLanguages()).
+                forEach(language -> {
+                    if(language.getIso_639_1().equals(""))
+                        language.setIso_639_1(languageRepository.getLanguageIsoCodeByName(language.getName()));
+                });
+    }
+
     private void saveDataInAdditionalTables(Collection<Movie> collection) {
-        Map<Long, Keyword> keywordMap = collection.stream().
+        List<Keyword> keywordList = collection.stream().
                 map(Movie::getKeywords).
                 flatMap(Arrays::stream).
-                collect(Collectors.toMap(Keyword::getId, keyword -> keyword, (key1, key2) -> key1));
-        keywordMap.forEach((id, keyword) -> keywordRepository.save(keyword));
+                collect(Collectors.toList());
+        keywordList.forEach(keywordRepository::saveKeyword);
         Map<Long, Keyword[]> map1 = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getKeywords));
         for(Map.Entry<Long, Keyword[]> entry : map1.entrySet()) {
@@ -156,11 +176,11 @@ public class MovieService {
                 movieKeywordIdRepository.save(entry.getKey(), keyword.getId());
         }
 
-        Map<Long, Genre> genreMap = collection.stream().
+        List<Genre> genreList = collection.stream().
                 map(Movie::getGenres).
                 flatMap(Arrays::stream).
-                collect(Collectors.toMap(Genre::getId, genre -> genre, (key1, key2) -> key1));
-        genreMap.forEach((id, genre) -> genreRepository.save(genre));
+                collect(Collectors.toList());
+        genreList.forEach(genreRepository::saveGenre);
         Map<Long, Genre[]> map2 = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getGenres));
         for(Map.Entry<Long, Genre[]> entry : map2.entrySet()) {
@@ -169,11 +189,11 @@ public class MovieService {
                 movieGenreIdRepository.save(entry.getKey(), genre.getId());
         }
 
-        Map<Long, ProductionCompany> companyMap = collection.stream().
+        List<ProductionCompany> companyList = collection.stream().
                 map(Movie::getProductionCompanies).
                 flatMap(Arrays::stream).
-                collect(Collectors.toMap(ProductionCompany::getId, company -> company, (key1, key2) -> key1));
-        companyMap.forEach((id, company) -> companyRepository.save(company));
+                collect(Collectors.toList());
+        companyList.forEach(companyRepository::saveCompany);
         Map<Long, ProductionCompany[]> map3 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getProductionCompanies));
         for(Map.Entry<Long, ProductionCompany[]> entry : map3.entrySet()) {
             ProductionCompany[] companies = entry.getValue();
@@ -182,11 +202,11 @@ public class MovieService {
             }
         }
 
-        Map<String, ProductionCountry> countryMap = collection.stream().
+        List<ProductionCountry> countryList = collection.stream().
                 map(Movie::getProductionCountries).
                 flatMap(Arrays::stream).
-                collect(Collectors.toMap(ProductionCountry::getIso_3166_1, country -> country, (key1, key2) -> key1));
-        countryMap.forEach((isoCode, country) -> countryRepository.save(country));
+                collect(Collectors.toList());
+        countryList.forEach(countryRepository::saveCountry);
         Map<Long, ProductionCountry[]> map4 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getProductionCountries));
         for(Map.Entry<Long, ProductionCountry[]> entry : map4.entrySet()) {
             ProductionCountry[] countries = entry.getValue();
@@ -195,11 +215,11 @@ public class MovieService {
             }
         }
 
-        Map<String, SpokenLanguage> languageMap = collection.stream().
+        List<SpokenLanguage> languageList = collection.stream().
                 map(Movie::getSpokenLanguages).
                 flatMap(Arrays::stream).
-                collect(Collectors.toMap(SpokenLanguage::getIso_639_1, language -> language, (key1, key2) -> key1));
-        languageMap.forEach((isoCode, language) -> languageRepository.save(language));
+                collect(Collectors.toList());
+        languageList.forEach(languageRepository::saveLanguage);
         Map<Long, SpokenLanguage[]> map5 = collection.stream().collect(Collectors.toMap(Movie::getId, Movie::getSpokenLanguages));
         for(Map.Entry<Long, SpokenLanguage[]> entry : map5.entrySet()) {
             SpokenLanguage[] languages = entry.getValue();
@@ -211,12 +231,13 @@ public class MovieService {
 
     private List<Movie> getMoviesSortedList(List<Long> ids, Comparator comparator, int limit) {
         List<Movie> movies = ids.stream().map(movieRepository::getMovieById).collect(Collectors.toList());
-        movies.forEach(this::fillMovie);
+        movies.forEach(this::addDataFromAdditionalTables);
         movies.sort(comparator.reversed());
+        if(limit > movies.size()) limit = movies.size();
         return limit > 0 ? movies.subList(0, limit) : movies;
     }
 
-    private void fillMovie(Movie movie) {
+    private void addDataFromAdditionalTables(Movie movie) {
         List<Long> keywordIds = movieKeywordIdRepository.getKeywordIdsByMovieId(movie.getId());
         Keyword[] keywords = keywordIds.stream().map(keywordRepository::getKeywordById).collect(Collectors.toList()).toArray(Keyword[]::new);
 

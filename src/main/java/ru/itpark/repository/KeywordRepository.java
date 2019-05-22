@@ -31,7 +31,7 @@ public class KeywordRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS keywords(" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT)");
     }
 
@@ -46,14 +46,23 @@ public class KeywordRepository {
     }
 
     public Keyword getKeywordById(long id) {
-        List<Keyword> list = template.query("SELECT id, name FROM keywords WHERE id = :id", Map.of("id", id), rowMapper);
-        return list.get(0);
+        return template.queryForObject("SELECT id, name FROM keywords WHERE id = :id", Map.of("id", id), rowMapper);
     }
 
-    public void save(Keyword keyword) {
+    public long getKeywordIdByName(String name) {
+        List<Long> list = template.query("SELECT id FROM keywords WHERE name LIKE :name",
+                Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
+        return list.isEmpty() ? 0 : list.get(0);
+    }
+
+    public void saveKeyword(Keyword keyword) {
         if(keyword.getId() == 0) {
-            template.update("INSERT INTO keywords (id, name) VALUES (:id, :name)",
-                    Map.of("id", keyword.getId(), "name", keyword.getName()));
+            template.update("INSERT INTO keywords (name) VALUES (:name)",
+                    Map.of("name", keyword.getName()));
+
+            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+                    queryForObject("SELECT last_insert_rowid()", Long.class));
+            keyword.setId(optional.get());
         }
         else {
             template.update("INSERT INTO keywords (id, name) VALUES (:id, :name) " +

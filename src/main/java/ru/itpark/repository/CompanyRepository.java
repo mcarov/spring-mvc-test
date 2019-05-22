@@ -31,7 +31,7 @@ public class CompanyRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS companies(" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT)");
     }
 
@@ -46,14 +46,23 @@ public class CompanyRepository {
     }
 
     public ProductionCompany getCompanyById(long id) {
-        List<ProductionCompany> list = template.query("SELECT id, name FROM companies WHERE id = :id", Map.of("id", id), rowMapper);
-        return list.get(0);
+        return template.queryForObject("SELECT id, name FROM companies WHERE id = :id", Map.of("id", id), rowMapper);
     }
 
-    public void save(ProductionCompany company) {
+    public long getCompanyIdByName(String name) {
+        List<Long> list = template.query("SELECT id FROM companies WHERE name LIKE :name",
+                Map.of("name", name), (resultSet, i) -> resultSet.getLong(1));
+        return list.isEmpty() ? 0 : list.get(0);
+    }
+
+    public void saveCompany(ProductionCompany company) {
         if(company.getId() == 0) {
-            template.update("INSERT INTO companies (id, name) VALUES (:id, :name)",
-                    Map.of("id", company.getId(), "name", company.getName()));
+            template.update("INSERT INTO companies (name) VALUES (:name)",
+                    Map.of("name", company.getName()));
+
+            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+                    queryForObject("SELECT last_insert_rowid()", Long.class));
+            company.setId(optional.get());
         }
         else {
             template.update("INSERT INTO companies (id, name) VALUES (:id, :name) " +

@@ -28,19 +28,34 @@ public class CountryRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS countries(" +
-                "iso_3166_1 TEXT PRIMARY KEY," +
+                "iso_3166_1 TEXT PRIMARY KEY, " +
                 "name TEXT)");
     }
 
     public ProductionCountry getCountryByIsoCode(String isoCode) {
-        List<ProductionCountry> list = template.query("SELECT iso_3166_1, name FROM countries WHERE iso_3166_1 LIKE :isoCode", Map.of("isoCode", isoCode), rowMapper);
-        return list.get(0);
+        return template.queryForObject("SELECT iso_3166_1, name FROM countries WHERE iso_3166_1 LIKE :isoCode", Map.of("isoCode", isoCode), rowMapper);
     }
 
-    public void save(ProductionCountry country) {
-        template.update("INSERT INTO countries (iso_3166_1, name) VALUES (:isoCode, :name) " +
-                        "ON CONFLICT(iso_3166_1) DO UPDATE SET name = :name WHERE iso_3166_1 = :isoCode",
-                Map.of("isoCode", country.getIso_3166_1(), "name", country.getName()));
+    public String getCountryIsoCodeByName(String name) {
+        List<String> list = template.query("SELECT iso_3166_1 FROM countries WHERE name LIKE :name",
+                Map.of("name", name), (resultSet, i) -> resultSet.getString(1));
+        return list.isEmpty() ? "" : list.get(0);
+    }
+
+    public void saveCountry(ProductionCountry country) {
+        if(country.getIso_3166_1().equals("")) {
+            String isoCode = "zz";
+            template.update("INSERT INTO countries (iso_3166_1, name) VALUES (:isoCode, :name) " +
+                            "ON CONFLICT(iso_3166_1) DO UPDATE SET name = :name WHERE iso_3166_1 = :isoCode",
+                    Map.of("isoCode", isoCode, "name", country.getName()));
+
+            country.setIso_3166_1(isoCode);
+        }
+        else {
+            template.update("INSERT INTO countries (iso_3166_1, name) VALUES (:isoCode, :name) " +
+                            "ON CONFLICT(iso_3166_1) DO UPDATE SET name = :name WHERE iso_3166_1 = :isoCode",
+                    Map.of("isoCode", country.getIso_3166_1(), "name", country.getName()));
+        }
     }
 
     public void removeCountryByIsoCode(String isoCode) {

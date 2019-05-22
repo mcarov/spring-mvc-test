@@ -28,19 +28,34 @@ public class LanguageRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS languages(" +
-                "iso_639_1 TEXT PRIMARY KEY," +
+                "iso_639_1 TEXT PRIMARY KEY, " +
                 "name TEXT)");
     }
 
     public SpokenLanguage getLanguageByIsoCode(String isoCode) {
-        List<SpokenLanguage> list = template.query("SELECT iso_639_1, name FROM languages WHERE iso_639_1 LIKE :isoCode", Map.of("isoCode", isoCode), rowMapper);
-        return list.get(0);
+        return template.queryForObject("SELECT iso_639_1, name FROM languages WHERE iso_639_1 LIKE :isoCode", Map.of("isoCode", isoCode), rowMapper);
     }
 
-    public void save(SpokenLanguage language) {
-        template.update("INSERT INTO languages (iso_639_1, name) VALUES (:isoCode, :name) " +
-                        "ON CONFLICT(iso_639_1) DO UPDATE SET name = :name WHERE iso_639_1 = :isoCode",
-                Map.of("isoCode", language.getIso_639_1(), "name", language.getName()));
+    public String getLanguageIsoCodeByName(String name) {
+        List<String> list = template.query("SELECT iso_639_1 FROM languages WHERE name LIKE :name",
+                Map.of("name", name), (resultSet, i) -> resultSet.getString(1));
+        return list.isEmpty() ? "" : list.get(0);
+    }
+
+    public void saveLanguage(SpokenLanguage language) {
+        if(language.getIso_639_1().equals("")) {
+            String isoCode = "und";
+            template.update("INSERT INTO languages (iso_639_1, name) VALUES (:isoCode, :name) " +
+                            "ON CONFLICT(iso_639_1) DO UPDATE SET name = :name WHERE iso_639_1 = :isoCode",
+                    Map.of("isoCode", isoCode, "name", language.getName()));
+
+            language.setIso_639_1(isoCode);
+        }
+        else {
+            template.update("INSERT INTO languages (iso_639_1, name) VALUES (:isoCode, :name) " +
+                            "ON CONFLICT(iso_639_1) DO UPDATE SET name = :name WHERE iso_639_1 = :isoCode",
+                    Map.of("isoCode", language.getIso_639_1(), "name", language.getName()));
+        }
     }
 
     public void removeLanguageByIsoCode(String isoCode) {

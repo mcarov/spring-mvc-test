@@ -119,7 +119,6 @@ public class MovieRepository {
             template.update("INSERT INTO movies (" +
                     "budget, " +
                     "homepage, " +
-                    "id, " +
                     "original_language, " +
                     "original_title, " +
                     "overview, " +
@@ -132,9 +131,13 @@ public class MovieRepository {
                     "title, " +
                     "vote_average, " +
                     "vote_count) " +
-                    "VALUES (:budget, :homepage, :id, :original_language, :original_title, " +
+                    "VALUES (:budget, :homepage, :original_language, :original_title, " +
                     ":overview, :popularity, :release_date, :revenue, :runtime, " +
                     ":status, :tagline, :title, :vote_average, :vote_count)", getParamMap(movie));
+
+            Optional<Long> optional = Optional.ofNullable(template.getJdbcTemplate().
+                    queryForObject("SELECT last_insert_rowid()", Long.class));
+            movie.setId(optional.get());
         }
         else {
             template.update("INSERT INTO movies (" +

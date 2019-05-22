@@ -2,6 +2,7 @@ package ru.itpark.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import ru.itpark.domain.*;
@@ -9,6 +10,8 @@ import ru.itpark.domain.*;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Data
@@ -55,7 +58,7 @@ public class MovieModel {
                 map(s -> new ProductionCompany(s,0)).toArray(ProductionCompany[]::new);
         movie.setProductionCompanies(companies);
         ProductionCountry[] countries = getStringStream(this.countries).
-                map(s -> new ProductionCountry("", s)).toArray(ProductionCountry[]::new);
+                map(s -> new ProductionCountry(getCountryIsoCodeByName(s), s)).toArray(ProductionCountry[]::new);
         movie.setProductionCountries(countries);
         try {
             movie.setReleaseDate(DateUtils.parseDate(date, "yyyy-MM-dd"));
@@ -66,7 +69,7 @@ public class MovieModel {
         movie.setRevenue(NumberUtils.toLong(revenue));
         movie.setRuntime(NumberUtils.toInt(runtime));
         SpokenLanguage[] languages = getStringStream(this.languages).
-                map(s -> new SpokenLanguage("", s)).toArray(SpokenLanguage[]::new);
+                map(s -> new SpokenLanguage(getLanguageIsoCodeByName(s), s)).toArray(SpokenLanguage[]::new);
         movie.setSpokenLanguages(languages);
         movie.setStatus(status);
         movie.setTagline(tagline);
@@ -78,6 +81,20 @@ public class MovieModel {
     }
 
     private Stream<String> getStringStream(String line) {
-        return Arrays.stream(line.split("[,;]")).map(String::trim);
+        return Arrays.stream(line.split("[,;]")).filter(StringUtils::isNotBlank).map(String::trim);
+    }
+
+    private String getCountryIsoCodeByName(String name) {
+        Optional<Locale> locale = Arrays.stream(Locale.getAvailableLocales()).filter(l -> StringUtils.isNotBlank(l.getDisplayCountry(l))).
+                filter(l -> StringUtils.containsIgnoreCase(l.getDisplayCountry(l), name) |
+                        StringUtils.containsIgnoreCase(name, l.getDisplayCountry(l))).findFirst();
+        return locale.isPresent() ? locale.get().getCountry() : "";
+    }
+
+    private String getLanguageIsoCodeByName(String name) {
+        Optional<Locale> locale = Arrays.stream(Locale.getAvailableLocales()).filter(l -> StringUtils.isNotBlank(l.getDisplayLanguage(l))).
+                filter(l -> StringUtils.containsIgnoreCase(l.getDisplayLanguage(l), name) |
+                        StringUtils.containsIgnoreCase(name, l.getDisplayLanguage(l))).findFirst();
+        return locale.isPresent() ? locale.get().getLanguage() : "";
     }
 }

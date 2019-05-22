@@ -20,7 +20,9 @@ public class MovieLanguageIdRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS movie_language(" +
-                "movie_id INTEGER, language_iso_code TEXT)");
+                "movie_id INTEGER, " +
+                "language_iso_code TEXT, " +
+                "PRIMARY KEY (movie_id, language_iso_code))");
     }
 
     public long countLanguageIsoCode(String isoCode) {
@@ -30,7 +32,8 @@ public class MovieLanguageIdRepository {
     }
 
     public void save(long movieId, String isoCode) {
-        template.update("INSERT INTO movie_language (movie_id, language_iso_code) VALUES (:movieId, :isoCode)",
+        template.update("INSERT INTO movie_language (movie_id, language_iso_code) VALUES (:movieId, :isoCode) " +
+                        "ON CONFLICT (movie_id, language_iso_code) DO UPDATE SET movie_id = :movieId, language_iso_code = :isoCode",
                 Map.of("movieId", movieId, "isoCode", isoCode));
     }
 

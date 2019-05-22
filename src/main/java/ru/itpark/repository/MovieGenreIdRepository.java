@@ -20,7 +20,9 @@ public class MovieGenreIdRepository {
     @PostConstruct
     public void init() {
         template.getJdbcTemplate().execute("CREATE TABLE IF NOT EXISTS movie_genre(" +
-                "movie_id INTEGER, genre_id INTEGER)");
+                "movie_id INTEGER, " +
+                "genre_id INTEGER, " +
+                "PRIMARY KEY (movie_id, genre_id))");
     }
 
     public long countGenreId(long id) {
@@ -30,7 +32,8 @@ public class MovieGenreIdRepository {
     }
 
     public void save(long movieId, long genreId) {
-        template.update("INSERT INTO movie_genre (movie_id, genre_id) VALUES (:movieId, :genreId)",
+        template.update("INSERT INTO movie_genre (movie_id, genre_id) VALUES (:movieId, :genreId) " +
+                        "ON CONFLICT (movie_id, genre_id) DO UPDATE SET movie_id = :movieId, genre_id = :genreId",
                 Map.of("movieId", movieId, "genreId", genreId));
     }
 

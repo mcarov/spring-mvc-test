@@ -4,6 +4,7 @@
 <%@ page import="ru.itpark.domain.*" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Optional" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!doctype html>
@@ -113,9 +114,53 @@
                     </div>
                     <div class="col">
                         <div class="form-group">
-                            <% Optional<String> status = Optional.ofNullable(movie.getStatus()); %>
+                            <% String status = Optional.ofNullable(movie.getStatus()).orElse(""); %>
                             <label for="status"><%=translated.get(13)%></label>
-                            <input id="status" name="status" class="form-control" type="text" value="<%=status.orElse("")%>">
+                            <select name="status" id="status" class="custom-select">
+                                <% if(StringUtils.equalsIgnoreCase(status, "Development")){ %>
+                                    <option value="">Unknown</option>
+                                    <option value="Development" selected>Development</option>
+                                    <option value="Pre-production">Pre-production</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Post-production">Post-production</option>
+                                    <option value="Released">Released</option>
+                                <% } else if(StringUtils.equalsIgnoreCase(status, "Pre-production")) { %>
+                                    <option value="">Unknown</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Pre-production" selected>Pre-production</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Post-production">Post-production</option>
+                                    <option value="Released">Released</option>
+                                <% } else if(StringUtils.equalsIgnoreCase(status, "Production")) { %>
+                                    <option value="">Unknown</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Pre-production">Pre-production</option>
+                                    <option value="Production" selected>Production</option>
+                                    <option value="Post-production">Post-production</option>
+                                    <option value="Released">Released</option>
+                                <% } else if(StringUtils.equalsIgnoreCase(status, "Post-production")) { %>
+                                    <option value="">Unknown</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Pre-production">Pre-production</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Post-production" selected>Post-production</option>
+                                    <option value="Released">Released</option>
+                                <% } else if(StringUtils.equalsIgnoreCase(status, "Released")) { %>
+                                    <option value="">Unknown</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Pre-production">Pre-production</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Post-production">Post-production</option>
+                                    <option value="Released" selected>Released</option>
+                                <% } else { %>
+                                    <option value="" selected>Unknown</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Pre-production">Pre-production</option>
+                                    <option value="Production">Production</option>
+                                    <option value="Post-production">Post-production</option>
+                                    <option value="Released">Released</option>
+                                <% } %>
+                            </select>
                         </div>
                     </div>
                 </div>

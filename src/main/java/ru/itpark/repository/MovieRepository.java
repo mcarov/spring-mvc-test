@@ -1,5 +1,6 @@
 package ru.itpark.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -78,7 +79,7 @@ public class MovieRepository {
     }
 
     public Movie getMovieById(long id) {
-       List<Movie> list = template.query("SELECT budget, " +
+       return template.queryForObject("SELECT budget, " +
                "homepage, " +
                "id, " +
                "original_language, " +
@@ -93,7 +94,6 @@ public class MovieRepository {
                "title, " +
                "vote_average, " +
                "vote_count FROM movies WHERE id = :id", Map.of("id", id), fullRowMapper);
-       return list.get(0);
     }
 
     public List<Movie> getMoviesTop20() {
@@ -137,7 +137,7 @@ public class MovieRepository {
 
             Optional<Long> movieId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            movie.setId(movieId.get());
+            movie.setId(movieId.orElseThrow(() -> new EmptyResultDataAccessException(1)));
         }
         else {
             template.update("INSERT INTO movies (" +

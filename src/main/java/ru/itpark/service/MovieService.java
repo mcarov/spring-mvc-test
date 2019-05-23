@@ -112,7 +112,7 @@ public class MovieService {
 
     public void removeMovieById(long id) {
         movieRepository.removeById(id);
-        long count = 0;
+        long count;
 
         List<Long> keywordIds = movieKeywordIdRepository.getKeywordIdsByMovieId(id);
         movieKeywordIdRepository.removeKeywordIdsByMovieId(id);

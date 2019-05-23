@@ -1,5 +1,6 @@
 package ru.itpark.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -62,7 +63,7 @@ public class CompanyRepository {
 
             Optional<Long> companyId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            company.setId(companyId.get());
+            company.setId(companyId.orElseThrow(() -> new EmptyResultDataAccessException(1)));
         }
         else {
             template.update("INSERT INTO companies (id, name) VALUES (:id, :name) " +

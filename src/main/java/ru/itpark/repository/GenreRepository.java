@@ -1,5 +1,6 @@
 package ru.itpark.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -57,7 +58,7 @@ public class GenreRepository {
 
             Optional<Long> genreId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            genre.setId(genreId.get());
+            genre.setId(genreId.orElseThrow(() -> new EmptyResultDataAccessException(1)));
         }
         else {
             template.update("INSERT INTO genres (id, name) VALUES (:id, :name) " +

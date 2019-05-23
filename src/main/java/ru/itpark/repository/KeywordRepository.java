@@ -1,5 +1,6 @@
 package ru.itpark.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -62,7 +63,7 @@ public class KeywordRepository {
 
             Optional<Long> keywordId = Optional.ofNullable(template.getJdbcTemplate().
                     queryForObject("SELECT last_insert_rowid()", Long.class));
-            keyword.setId(keywordId.get());
+            keyword.setId(keywordId.orElseThrow(() -> new EmptyResultDataAccessException(1)));
         }
         else {
             template.update("INSERT INTO keywords (id, name) VALUES (:id, :name) " +

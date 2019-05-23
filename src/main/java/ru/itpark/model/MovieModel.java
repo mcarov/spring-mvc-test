@@ -38,46 +38,56 @@ public class MovieModel {
     private String rating;
     private String votes;
 
-    public Movie getMovie() {
-        Movie movie = new Movie();
+    public MovieBuilder getBuilder() {
+        return new MovieBuilder();
+    }
 
-        movie.setId(id);
-        movie.setBudget(NumberUtils.toLong(budget));
-        Genre[] genres = getStringStream(this.genres).
-                map(s -> new Genre(0, s)).toArray(Genre[]::new);
-        movie.setGenres(genres);
-        movie.setHomepage(homepage);
-        Keyword[] keywords = getStringStream(this.keywords).
-                map(s -> new Keyword(0, s)).toArray(Keyword[]::new);
-        movie.setKeywords(keywords);
-        movie.setOriginalLanguage(original_language);
-        movie.setOriginalTitle(original_title);
-        movie.setOverview(overview);
-        movie.setPopularity(NumberUtils.toDouble(popularity));
-        ProductionCompany[] companies = getStringStream(this.companies).
-                map(s -> new ProductionCompany(s,0)).toArray(ProductionCompany[]::new);
-        movie.setProductionCompanies(companies);
-        ProductionCountry[] countries = getStringStream(this.countries).
-                map(s -> new ProductionCountry(getCountryIsoCodeByName(s), s)).toArray(ProductionCountry[]::new);
-        movie.setProductionCountries(countries);
-        try {
-            movie.setReleaseDate(DateUtils.parseDate(date, "yyyy-MM-dd"));
-        }
-        catch(ParseException e) {
-            movie.setReleaseDate(new Date(0));
-        }
-        movie.setRevenue(NumberUtils.toLong(revenue));
-        movie.setRuntime(NumberUtils.toInt(runtime));
-        SpokenLanguage[] languages = getStringStream(this.languages).
-                map(s -> new SpokenLanguage(getLanguageIsoCodeByName(s), s)).toArray(SpokenLanguage[]::new);
-        movie.setSpokenLanguages(languages);
-        movie.setStatus(status);
-        movie.setTagline(tagline);
-        movie.setTitle(title);
-        movie.setVoteAverage(NumberUtils.toDouble(rating));
-        movie.setVoteCount(NumberUtils.toLong(votes));
+    public class MovieBuilder {
+        private Movie movie;
 
-        return movie;
+        private MovieBuilder() {
+            movie = new Movie();
+        }
+
+        public Movie build() {
+            movie.setId(id);
+            movie.setBudget(NumberUtils.toLong(budget));
+            Genre[] genreArray = getStringStream(genres).
+                    map(s -> new Genre(0, s)).toArray(Genre[]::new);
+            movie.setGenres(genreArray);
+            movie.setHomepage(homepage);
+            Keyword[] keywordArray = getStringStream(keywords).
+                    map(s -> new Keyword(0, s)).toArray(Keyword[]::new);
+            movie.setKeywords(keywordArray);
+            movie.setOriginalLanguage(original_language);
+            movie.setOriginalTitle(original_title);
+            movie.setOverview(overview);
+            movie.setPopularity(NumberUtils.toDouble(popularity));
+            ProductionCompany[] companyArray = getStringStream(companies).
+                    map(s -> new ProductionCompany(s,0)).toArray(ProductionCompany[]::new);
+            movie.setProductionCompanies(companyArray);
+            ProductionCountry[] countryArray = getStringStream(countries).
+                    map(s -> new ProductionCountry(getCountryIsoCodeByName(s), s)).toArray(ProductionCountry[]::new);
+            movie.setProductionCountries(countryArray);
+            try {
+                movie.setReleaseDate(DateUtils.parseDate(date, "yyyy-MM-dd"));
+            }
+            catch(ParseException e) {
+                movie.setReleaseDate(new Date(0));
+            }
+            movie.setRevenue(NumberUtils.toLong(revenue));
+            movie.setRuntime(NumberUtils.toInt(runtime));
+            SpokenLanguage[] languageArray = getStringStream(languages).
+                    map(s -> new SpokenLanguage(getLanguageIsoCodeByName(s), s)).toArray(SpokenLanguage[]::new);
+            movie.setSpokenLanguages(languageArray);
+            movie.setStatus(status);
+            movie.setTagline(tagline);
+            movie.setTitle(title);
+            movie.setVoteAverage(NumberUtils.toDouble(rating));
+            movie.setVoteCount(NumberUtils.toLong(votes));
+
+            return movie;
+        }
     }
 
     private Stream<String> getStringStream(String line) {

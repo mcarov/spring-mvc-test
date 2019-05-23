@@ -163,7 +163,7 @@ public class MovieController {
     @PostMapping("/movies/{id}/save")
     public String saveMovie(@PathVariable long id, @ModelAttribute MovieModel model) {
         model.setId(id);
-        movieService.saveMovie(model.getMovie());
+        movieService.saveMovie(model.getBuilder().build());
         return id == 0 ? "redirect:/" : String.join("/","redirect:", "movies", String.valueOf(id));
     }
 

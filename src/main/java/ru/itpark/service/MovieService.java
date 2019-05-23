@@ -244,7 +244,7 @@ public class MovieService {
         }
     }
 
-    private List<Movie> getMoviesSortedList(List<Long> ids, Comparator comparator, int limit) {
+    private List<Movie> getMoviesSortedList(List<Long> ids, Comparator<Movie> comparator, int limit) {
         List<Movie> movies = ids.stream().map(movieRepository::getMovieById).collect(Collectors.toList());
         movies.forEach(this::addDataFromAdditionalTables);
         movies.sort(comparator.reversed());

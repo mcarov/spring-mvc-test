@@ -15,29 +15,21 @@ import static ru.itpark.Constants.LIST_SIZE;
 @Service
 @RequiredArgsConstructor
 public class MovieService {
+    private final FileService fileService;
+    private final KeywordService keywordService;
+    private final GenreService genreService;
+    private final CompanyService companyService;
+    private final CountryService countryService;
+    private final LanguageService languageService;
     private final MovieRepository movieRepository;
     private final MovieKeywordIdRepository movieKeywordIdRepository;
     private final MovieGenreIdRepository movieGenreIdRepository;
     private final MovieCompanyIdRepository movieCompanyIdRepository;
     private final MovieCountryIdRepository movieCountryIdRepository;
     private final MovieLanguageIdRepository movieLanguageIdRepository;
-    private final KeywordRepository keywordRepository;
-    private final GenreRepository genreRepository;
-    private final CompanyRepository companyRepository;
-    private final CountryRepository countryRepository;
-    private final LanguageRepository languageRepository;
-    private final FileService fileService;
 
     public long getMovieRepoSize() {
         return movieRepository.size();
-    }
-
-    public long getKeywordRepoSize() {
-        return keywordRepository.size();
-    }
-
-    public long getCompanyRepoSize() {
-        return companyRepository.size();
     }
 
     public Movie getMovieById(long id) {
@@ -55,15 +47,6 @@ public class MovieService {
         return movieRepository.getMovies(offset, LIST_SIZE);
     }
 
-    public List<Keyword> getCollections(int number) {
-        int offset = LIST_SIZE*(number-1);
-        return keywordRepository.getKeywords(offset);
-    }
-
-    public List<Genre> getGenres() {
-        return genreRepository.getGenres(0);
-    }
-
     public List<Movie> getMoviesByCollectionId(long id) {
         List<Long> movieIds = movieKeywordIdRepository.getMovieIdsByKeywordId(id);
         return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getPopularity), 0);
@@ -79,21 +62,8 @@ public class MovieService {
         return getMoviesSortedList(movieIds, Comparator.comparing(Movie::getReleaseDate), 0);
     }
 
-    public List<ProductionCompany> getCompanies(int number) {
-        int offset = LIST_SIZE*(number-1);
-        return companyRepository.getCompanies(offset);
-    }
-
-    public Genre getGenreById(long id) {
-        return genreRepository.getGenreById(id);
-    }
-
-    public Keyword getKeywordById(long id) {
-        return keywordRepository.getKeywordById(id);
-    }
-
     public ProductionCompany getCompanyById(long id) {
-        return companyRepository.getCompanyById(id);
+        return companyService.getCompanyById(id);
     }
 
     public void updateDatabaseFromFile(MultipartFile file) throws IOException {
@@ -119,7 +89,7 @@ public class MovieService {
         for(Long keywordId : keywordIds) {
             count = movieKeywordIdRepository.countKeywordId(keywordId);
             if(count == 0)
-                keywordRepository.removeKeywordById(keywordId);
+                keywordService.removeKeywordById(keywordId);
         }
 
         List<Long> genreIds = movieGenreIdRepository.getGenreIdsByMovieId(id);
@@ -127,7 +97,7 @@ public class MovieService {
         for(Long genreId : genreIds) {
             count = movieGenreIdRepository.countGenreId(genreId);
             if(count == 0)
-                genreRepository.removeGenreById(genreId);
+                genreService.removeGenreById(genreId);
         }
 
         List<Long> companyIds = movieCompanyIdRepository.getCompanyIdsByMovieId(id);
@@ -135,7 +105,7 @@ public class MovieService {
         for(Long companyId : companyIds) {
             count = movieCompanyIdRepository.countCompanyId(companyId);
             if(count == 0)
-                companyRepository.removeCompanyById(companyId);
+                companyService.removeCompanyById(companyId);
         }
 
         List<String> countryIsoCodes = movieCountryIdRepository.getCountryIsoCodesByMovieId(id);
@@ -143,7 +113,7 @@ public class MovieService {
         for(String isoCode : countryIsoCodes) {
             count = movieCountryIdRepository.countContryIsoCode(isoCode);
             if(count == 0)
-                countryRepository.removeCountryByIsoCode(isoCode);
+                countryService.removeCountryByIsoCode(isoCode);
         }
 
         List<String> languageIsoCodes = movieLanguageIdRepository.getLanguageIsoCodesByMovieId(id);
@@ -151,26 +121,26 @@ public class MovieService {
         for(String isoCode : languageIsoCodes) {
             count = movieLanguageIdRepository.countLanguageIsoCode(isoCode);
             if(count == 0)
-                languageRepository.removeLanguageByIsoCode(isoCode);
+                languageService.removeLanguageByIsoCode(isoCode);
         }
     }
 
     private void searchIdsAndIsoCodes(Movie movie) {
         Arrays.asList(movie.getKeywords()).
-                forEach(keyword -> keyword.setId(keywordRepository.getKeywordIdByName(keyword.getName())));
+                forEach(keyword -> keyword.setId(keywordService.getKeywordIdByName(keyword.getName())));
         Arrays.asList(movie.getGenres()).
-                forEach(genre -> genre.setId(genreRepository.getGenreIdByName(genre.getName())));
+                forEach(genre -> genre.setId(genreService.getGenreIdByName(genre.getName())));
         Arrays.asList(movie.getProductionCompanies()).
-                forEach(company -> company.setId(companyRepository.getCompanyIdByName(company.getName())));
+                forEach(company -> company.setId(companyService.getCompanyIdByName(company.getName())));
         Arrays.asList(movie.getProductionCountries()).
                 forEach(country -> {
                     if(country.getIso_3166_1().equals(""))
-                        country.setIso_3166_1(countryRepository.getCountryIsoCodeByName(country.getName()));
+                        country.setIso_3166_1(countryService.getCountryIsoCodeByName(country.getName()));
                 });
         Arrays.asList(movie.getSpokenLanguages()).
                 forEach(language -> {
                     if(language.getIso_639_1().equals(""))
-                        language.setIso_639_1(languageRepository.getLanguageIsoCodeByName(language.getName()));
+                        language.setIso_639_1(languageService.getLanguageIsoCodeByName(language.getName()));
                 });
     }
 
@@ -179,7 +149,7 @@ public class MovieService {
                 map(Movie::getKeywords).
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
-        keywordList.forEach(keywordRepository::saveKeyword);
+        keywordList.forEach(keywordService::saveKeyword);
         Map<Long, Keyword[]> keywordMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getKeywords));
         for(Map.Entry<Long, Keyword[]> entry : keywordMap.entrySet()) {
@@ -192,7 +162,7 @@ public class MovieService {
                 map(Movie::getGenres).
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
-        genreList.forEach(genreRepository::saveGenre);
+        genreList.forEach(genreService::saveGenre);
         Map<Long, Genre[]> genreMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getGenres));
         for(Map.Entry<Long, Genre[]> entry : genreMap.entrySet()) {
@@ -205,7 +175,7 @@ public class MovieService {
                 map(Movie::getProductionCompanies).
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
-        companyList.forEach(companyRepository::saveCompany);
+        companyList.forEach(companyService::saveCompany);
         Map<Long, ProductionCompany[]> companyMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getProductionCompanies));
         for(Map.Entry<Long, ProductionCompany[]> entry : companyMap.entrySet()) {
@@ -219,7 +189,7 @@ public class MovieService {
                 map(Movie::getProductionCountries).
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
-        countryList.forEach(countryRepository::saveCountry);
+        countryList.forEach(countryService::saveCountry);
         Map<Long, ProductionCountry[]> countryMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getProductionCountries));
         for(Map.Entry<Long, ProductionCountry[]> entry : countryMap.entrySet()) {
@@ -233,7 +203,7 @@ public class MovieService {
                 map(Movie::getSpokenLanguages).
                 flatMap(Arrays::stream).
                 collect(Collectors.toList());
-        languageList.forEach(languageRepository::saveLanguage);
+        languageList.forEach(languageService::saveLanguage);
         Map<Long, SpokenLanguage[]> languageMap = collection.stream().
                 collect(Collectors.toMap(Movie::getId, Movie::getSpokenLanguages));
         for(Map.Entry<Long, SpokenLanguage[]> entry : languageMap.entrySet()) {
@@ -254,19 +224,19 @@ public class MovieService {
 
     private void addDataFromAdditionalTables(Movie movie) {
         List<Long> keywordIds = movieKeywordIdRepository.getKeywordIdsByMovieId(movie.getId());
-        Keyword[] keywords = keywordIds.stream().map(keywordRepository::getKeywordById).collect(Collectors.toList()).toArray(Keyword[]::new);
+        Keyword[] keywords = keywordIds.stream().map(keywordService::getKeywordById).collect(Collectors.toList()).toArray(Keyword[]::new);
 
         List<Long> genreIds = movieGenreIdRepository.getGenreIdsByMovieId(movie.getId());
-        Genre[] genres = genreIds.stream().map(genreRepository::getGenreById).collect(Collectors.toList()).toArray(Genre[]::new);
+        Genre[] genres = genreIds.stream().map(genreService::getGenreById).collect(Collectors.toList()).toArray(Genre[]::new);
 
         List<Long> companyIds = movieCompanyIdRepository.getCompanyIdsByMovieId(movie.getId());
-        ProductionCompany[] companies = companyIds.stream().map(companyRepository::getCompanyById).collect(Collectors.toList()).toArray(ProductionCompany[]::new);
+        ProductionCompany[] companies = companyIds.stream().map(companyService::getCompanyById).collect(Collectors.toList()).toArray(ProductionCompany[]::new);
 
         List<String> countryIsoCodes = movieCountryIdRepository.getCountryIsoCodesByMovieId(movie.getId());
-        ProductionCountry[] countries = countryIsoCodes.stream().map(countryRepository::getCountryByIsoCode).collect(Collectors.toList()).toArray(ProductionCountry[]::new);
+        ProductionCountry[] countries = countryIsoCodes.stream().map(countryService::getCountryByIsoCode).collect(Collectors.toList()).toArray(ProductionCountry[]::new);
 
         List<String> languageIsoCodes = movieLanguageIdRepository.getLanguageIsoCodesByMovieId(movie.getId());
-        SpokenLanguage[] languages = languageIsoCodes.stream().map(languageRepository::getLanguageByIsoCode).collect(Collectors.toList()).toArray(SpokenLanguage[]::new);
+        SpokenLanguage[] languages = languageIsoCodes.stream().map(languageService::getLanguageByIsoCode).collect(Collectors.toList()).toArray(SpokenLanguage[]::new);
 
         movie.setKeywords(keywords);
         movie.setGenres(genres);

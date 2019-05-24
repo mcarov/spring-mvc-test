@@ -12,12 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static javax.servlet.ServletRegistration.Dynamic;
-import static ru.itpark.Constants.UPLOAD_PATH;
 
 public class AppInitializer implements WebApplicationInitializer {
+    private final String uploadPath;
 
     public AppInitializer() throws IOException {
-        Files.createDirectories(Paths.get(UPLOAD_PATH));
+        uploadPath = System.getenv("UPLOAD_PATH");
+        Files.createDirectories(Paths.get(uploadPath));
     }
 
     @Override
@@ -28,7 +29,7 @@ public class AppInitializer implements WebApplicationInitializer {
         var dispatcherServlet = new DispatcherServlet(wac);
         Dynamic registration = servletContext.addServlet("dispatcher", dispatcherServlet);
         long fileSize = 52428800;
-        registration.setMultipartConfig(new MultipartConfigElement(UPLOAD_PATH, fileSize, fileSize, 0));
+        registration.setMultipartConfig(new MultipartConfigElement(uploadPath, fileSize, fileSize, 0));
         registration.setLoadOnStartup(1);
         registration.addMapping("/");
     }

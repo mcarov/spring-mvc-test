@@ -21,18 +21,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static ru.itpark.Constants.UPLOAD_PATH;
-
 @Service
 @RequiredArgsConstructor
 public class FileService {
     private final Gson gson;
+    private final String uploadPath = System.getenv("UPLOAD_PATH");
 
     List<Movie> importFromCsvFile(MultipartFile file) throws IOException {
         String csvFileId = UUID.randomUUID().toString();
-        file.transferTo(Paths.get(UPLOAD_PATH).resolve(csvFileId));
+        file.transferTo(Paths.get(uploadPath).resolve(csvFileId));
 
-        try(Reader reader = Files.newBufferedReader(Paths.get(UPLOAD_PATH).resolve(csvFileId));
+        try(Reader reader = Files.newBufferedReader(Paths.get(uploadPath).resolve(csvFileId));
             CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT.
                     withFirstRecordAsHeader().
                     withIgnoreHeaderCase().
